@@ -1,14 +1,10 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.print.PrinterException;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.sql.Time;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -16,6 +12,10 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 public class client extends JFrame implements ActionListener {
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 1L;
 	static Socket conn;
 	JPanel panel;
 	JTextField NewMsg;
@@ -39,7 +39,7 @@ public class client extends JFrame implements ActionListener {
 		Send.setBounds(375, 400, 95, 30);
 		panel.add(Send);
 		Send.addActionListener(this);
-		conn = new Socket("192.168.137.31", 2000);
+		conn = new Socket("127.0.0.1", 2000);
 
 		/*
 		 * for remote pc use ip address of server with function
@@ -62,7 +62,6 @@ public class client extends JFrame implements ActionListener {
 					Thread.sleep(3000);
 					System.exit(0);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -71,7 +70,7 @@ public class client extends JFrame implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
+		
 		if ((e.getSource() == Send) && (NewMsg.getText() != "")) {
 
 			ChatHistory.setText(ChatHistory.getText() + '\n' + "Me:"
@@ -87,7 +86,7 @@ public class client extends JFrame implements ActionListener {
 					Thread.sleep(3000);
 					System.exit(0);
 				} catch (InterruptedException e2) {
-					// TODO Auto-generated catch block
+					
 					e2.printStackTrace();
 				}
 			}
@@ -97,6 +96,6 @@ public class client extends JFrame implements ActionListener {
 
 	public static void main(String[] args) throws UnknownHostException,
 			IOException {
-		client chatForm = new client();
+		new client();
 	}
 }

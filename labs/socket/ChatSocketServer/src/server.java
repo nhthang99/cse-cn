@@ -16,6 +16,10 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 public class server extends JFrame implements ActionListener {
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = -1715062133179221611L;
 	static ServerSocket server;
 	static Socket conn;
 	JPanel panel;
@@ -45,7 +49,7 @@ public class server extends JFrame implements ActionListener {
 		panel.add(Send);
 		this.setTitle("Server");
 		Send.addActionListener(this);
-		server = new ServerSocket(2000, 1, InetAddress.getByName("192.168.137.31"));
+		server = new ServerSocket(2000, 1, InetAddress.getByName("127.0.0.1"));
 		ChatHistory.setText("Waiting for Client");
 		conn = server.accept();
 		ChatHistory.setText(ChatHistory.getText() + '\n' + "Client Found");
@@ -62,7 +66,7 @@ public class server extends JFrame implements ActionListener {
 					Thread.sleep(3000);
 					System.exit(0);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
+					
 					e.printStackTrace();
 				}
 			}
@@ -71,9 +75,9 @@ public class server extends JFrame implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
+		
 		if ((e.getSource() == Send) && (NewMsg.getText() != "")) {
-			ChatHistory.setText(ChatHistory.getText() + '\n' + "ME:"
+			ChatHistory.setText(ChatHistory.getText() + '\n' + "Me:"
 					+ NewMsg.getText());
 			try {
 				DataOutputStream dos = new DataOutputStream(
@@ -84,7 +88,7 @@ public class server extends JFrame implements ActionListener {
 					Thread.sleep(3000);
 					System.exit(0);
 				} catch (InterruptedException e2) {
-					// TODO Auto-generated catch block
+					
 					e2.printStackTrace();
 				}
 			}
