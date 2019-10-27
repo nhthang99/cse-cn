@@ -1,6 +1,7 @@
 from PyQt5.QtCore import QAbstractListModel
 from PyQt5.QtCore import Qt
 
+
 class MessageModel(QAbstractListModel):
     def __init__(self, *args, messages=None, **kwargs):
         super(MessageModel, self).__init__(*args, **kwargs)
@@ -13,4 +14,3 @@ class MessageModel(QAbstractListModel):
 
     def rowCount(self, index):
         return len(self.messages)
-        

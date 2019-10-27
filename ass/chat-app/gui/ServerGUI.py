@@ -48,6 +48,7 @@ class Ui_Server(object):
         self.horizontalLayout_2.addWidget(self.btnStartServer)
         self.btnStopServer = QtWidgets.QPushButton(self.horizontalLayoutWidget_2)
         self.btnStopServer.setObjectName("btnStopServer")
+        self.btnStopServer.setDisabled(True)
         self.horizontalLayout_2.addWidget(self.btnStopServer)
         self.frame = QtWidgets.QFrame(self.centralwidget)
         self.frame.setGeometry(QtCore.QRect(179, 10, 451, 31))
