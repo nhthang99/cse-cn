@@ -33,8 +33,10 @@ class Client(QThread):
                 peerList = Decode.decode_peer_info_list(data)
                 if isinstance(peerList, list):
                     usernameListFriend = [peer[0] for peer in peerList]
-                    time.sleep(1)
+                    usernameListFriend.remove(self.username)
                     self.change_friend_list.emit(usernameListFriend)
+                    time.sleep(1)
+
                     # self.window_chat.setupFriendsList(usernameListFriend)
             except socket.error as e:
                 print(e)

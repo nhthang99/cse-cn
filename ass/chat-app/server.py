@@ -41,7 +41,7 @@ def broadcast(data):
 peerList = []
 socketPeerList = []
 HOST = '127.0.0.1'
-PORT = 8881
+PORT = 8888
 BUFSIZ = 4096
 ADDR = (HOST, PORT)
 isRunning = True
