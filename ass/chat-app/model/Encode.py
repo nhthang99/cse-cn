@@ -14,17 +14,21 @@ def encode_peer_info_list(lst):
     xml_dict = []
     xml_parse = ''
 
-    for item in lst:
+    if lst:
+        for item in lst:
+            xml = {
+                PEER_NAME_TAG: item[0],
+                PEER_HOST_TAG: item[1],
+                PEER_PORT_TAG: item[2],
+            }
+            xml_dict.append(xmltodict.unparse(xml, full_document=False, short_empty_elements=True))
+
+        for xml in xml_dict:
+            xml_parse += '<p>' + xml + '</p>'
+
+        return xml_parse
+    else:
         xml = {
-            PEER_NAME_TAG: item[0],
-            PEER_HOST_TAG: item[1],
-            PEER_PORT_TAG: item[2],
+            EMPTY_PEER_TAG: EMPTY_PEER_TAG,
         }
-        xml_dict.append(xmltodict.unparse(xml, full_document=False, short_empty_elements=True))
-
-    for xml in xml_dict:
-        xml_parse += '<p>' + xml + '</p>'
-
-    return xml_parse
-
-
+        return xmltodict.unparse(xml, full_document=False, short_empty_elements=True)

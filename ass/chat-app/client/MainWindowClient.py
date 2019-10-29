@@ -1,17 +1,13 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QInputDialog, QLineEdit
 from PyQt5.QtGui import QPixmap, QStandardItem, QStandardItemModel
 
 from gui.ClientGUI import Ui_MainWindow as WindowChat
 from gui.LoginGUI import Ui_MainWindow as WindowLogin
 from client.Client import Client
 
-client = None
-
 
 class MainWindowChat(QMainWindow):
-
-    global client
 
     def __init__(self, username):
         super(MainWindowChat, self).__init__()
@@ -57,12 +53,14 @@ class MainWindowLogin(QMainWindow):
         host = self.getHost()
         port = self.getPort()
         try:
-            # global client
             self.windowChat = MainWindowChat(username)
-            client = Client(username, host, port, self.windowChat)
-            client.connectToServer()
-            client.start()
-            client.change_friend_list.connect(self.windowChat.setupFriendsList)
+            self.client = Client(username, host, port, self.windowChat)
+            isExistUsername = self.client.connectToServer()
+            if isExistUsername:
+                self.dialogChangeUsername()
+
+            self.client.start()
+            self.client.change_friend_list.connect(self.windowChat.setupFriendsList)
             self.windowChat.show()
             MainWindowLogin.close(self)
         except:
@@ -88,6 +86,18 @@ class MainWindowLogin(QMainWindow):
             return int(port)
         else:
             self.showMessageBox("Error", "Please enter server's port ...\n Try to again")
+
+    def dialogChangeUsername(self):
+        new_name, okPressed = QInputDialog.getText(self, "Username in user", "Your username", QLineEdit.Normal, "")
+        if okPressed and new_name not in self.client.usernameList:
+            self.windowChat.username = new_name
+            self.windowChat.ui.txtUsername.setText(new_name)
+            port = self.client.generateRandomPort()
+            self.client.send_peer_info_to_server(new_name, port)
+        else:
+            self.showMessageBox("Invalid", "Username in use")
+            self.dialogChangeUsername()
+
 
     def showMessageBox(self, title, msg):
         return QMessageBox.about(self, title, msg)

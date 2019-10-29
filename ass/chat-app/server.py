@@ -9,7 +9,10 @@ def accept_incoming_connections():
     """Sets up handling for incoming clients."""
     while True:
         client, client_address = server.accept()
-        socketPeerList.append(client)
+        if client:
+            socketPeerList.append(client)
+            info_peers = Encode.encode_peer_info_list(peerList)
+            broadcast(info_peers)
         Thread(target=handle_client, args=(client, client_address)).start()
 
 
@@ -20,11 +23,14 @@ def handle_client(client,client_address):
         data = client.recv(BUFSIZ).decode("utf8")
         if data:
             username, port = Decode.decode_peer_name(data)
-            host = client_address[0]
-            print("%s:%s:%s has connected." % (username, client_address[0], client_address[1]))
-            peerList.append([username, host, int(port)])
-            info_peers = Encode.encode_peer_info_list(peerList)
-            Thread(target=broadcast, args=(info_peers, )).start()
+            if not username and not port:
+                break
+            else:
+                host = client_address[0]
+                print("%s:%s:%s has connected." % (username, client_address[0], client_address[1]))
+                peerList.append([username, host, int(port)])
+            print(peerList)
+
 
 
 def close(server, socketPeerList):

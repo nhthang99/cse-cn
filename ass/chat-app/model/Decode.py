@@ -8,7 +8,7 @@ def decode_peer_name(encode):
         parse = xmltodict.parse(encode, process_namespaces=True)
         return parse['root'][PEER_NAME_TAG], parse['root'][PEER_PORT_TAG]
     except:
-        return None
+        return None, None
 
 
 def decode_peer_info_list(encode):
@@ -16,13 +16,16 @@ def decode_peer_info_list(encode):
     encode = '<root>' + encode + '</root>'
     try:
         parse = xmltodict.parse(encode, process_namespaces=True)
-        if isinstance(parse['root']['p'], list):
-            for p in parse['root']['p']:
+        try:
+            return parse['root'][EMPTY_PEER_TAG]
+        except:
+            if isinstance(parse['root']['p'], list):
+                for p in parse['root']['p']:
+                    result.append([p[PEER_NAME_TAG], p[PEER_HOST_TAG], p[PEER_PORT_TAG]])
+                return result
+            else:
+                p = parse['root']['p']
                 result.append([p[PEER_NAME_TAG], p[PEER_HOST_TAG], p[PEER_PORT_TAG]])
-            return result
-        else:
-            p = parse['root']['p']
-            result.append([p[PEER_NAME_TAG], p[PEER_HOST_TAG], p[PEER_PORT_TAG]])
-            return result
+                return result
     except:
         return None

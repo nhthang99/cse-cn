@@ -1,6 +1,6 @@
-import socket, sys, time
+import socket, sys
 from random import randint
-from model import Encode, Decode
+from model import Encode, Decode, Tags
 from PyQt5.QtCore import QThread, pyqtSignal
 
 
@@ -15,12 +15,35 @@ class Client(QThread):
         self.username = username
         self.window_chat = window_chat
         self.isRunning = True
+        self.usernameList = []
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     def connectToServer(self):
         self.client_socket.connect((self.host, self.port))
-        info = Encode.encode_peer_name(self.username, self.generateRandomPort())
-        self.client_socket.send(bytes(info, "utf8"))
+        data = self.client_socket.recv(self.RECV_SIZE).decode("utf8")
+        peerList = Decode.decode_peer_info_list(data)
+
+        # First peer join in app
+        if peerList == Tags.EMPTY_PEER_TAG:
+            self.send_peer_info_to_server(self.username, self.generateRandomPort())
+        # App contained multiple people
+        else:
+            # Check username whether exist or not
+            self.usernameList = [peer[0] for peer in peerList]
+            if self.username in self.usernameList:
+                # Username in user
+                return True
+            else:
+                # Username is valid
+                return False
+
+    def send_peer_info_to_server(self, username, port):
+        info = Encode.encode_peer_name(username, port)
+        self.send_to_server(info)
+
+
+    def send_to_server(self, msg):
+        self.client_socket.send(bytes(msg, "utf8"))
 
     def run(self):
         while self.isRunning:
@@ -30,14 +53,10 @@ class Client(QThread):
         while self.isRunning:
             try:
                 data = self.client_socket.recv(self.RECV_SIZE).decode("utf8")
-                peerList = Decode.decode_peer_info_list(data)
-                if isinstance(peerList, list):
-                    usernameListFriend = [peer[0] for peer in peerList]
-                    usernameListFriend.remove(self.username)
-                    self.change_friend_list.emit(usernameListFriend)
-                    time.sleep(1)
+                # print(data)
+                # peerList = Decode.decode_peer_info_list(data)
 
-                    # self.window_chat.setupFriendsList(usernameListFriend)
+                # self.window_chat.setupFriendsList(usernameListFriend)
             except socket.error as e:
                 print(e)
                 self.stop()
