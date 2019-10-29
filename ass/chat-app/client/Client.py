@@ -1,27 +1,49 @@
-import socket
+import socket, sys, time
 from random import randint
-from threading import Thread
+from model import Encode, Decode
+from PyQt5.QtCore import QThread, pyqtSignal
 
 
-class Client:
+class Client(QThread):
+    RECV_SIZE = 4096
+    change_friend_list = pyqtSignal(list)
 
-    RECV_SIZE = 1024
-
-    def __init__(self, username='Unknown', host='127.0.0.1', port=8888):
+    def __init__(self, username='', host='127.0.0.1', port=8888, window_chat=None, parent=None):
+        super(Client, self).__init__(parent)
         self.host = host
         self.port = port
         self.username = username
+        self.window_chat = window_chat
+        self.isRunning = True
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     def connectToServer(self):
         self.client_socket.connect((self.host, self.port))
-        self.client_socket.send(bytes('<p>' + self.username + ':' + str(self.generateRandomPort()) + '</p>', "utf8"))
-        Thread(target=self.receive())
+        info = Encode.encode_peer_name(self.username, self.generateRandomPort())
+        self.client_socket.send(bytes(info, "utf8"))
+
+    def run(self):
+        while self.isRunning:
+            self.receive()
 
     def receive(self):
-        while True:
-            data = self.client_socket.recv(self.RECV_SIZE).decode("utf8")
-            print(data)
+        while self.isRunning:
+            try:
+                data = self.client_socket.recv(self.RECV_SIZE).decode("utf8")
+                peerList = Decode.decode_peer_info_list(data)
+                if isinstance(peerList, list):
+                    usernameListFriend = [peer[0] for peer in peerList]
+                    time.sleep(1)
+                    self.change_friend_list.emit(usernameListFriend)
+                    # self.window_chat.setupFriendsList(usernameListFriend)
+            except socket.error as e:
+                print(e)
+                self.stop()
+                sys.exit()
+
+    def stop(self):
+        self.isRunning = False
+        self.client_socket.close()
 
     def generateRandomPort(self):
         port = randint(10000, 12000)
@@ -29,12 +51,14 @@ class Client:
             port = randint(10000, 12000)
         return port
 
-
     def isExistPort(self, port):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
         try:
             sock.connect((self.host, port))
-            sock.shutdown(2)
+            sock.shutdown(1)
             return True
-        except:
+        except socket.error:
+            return False
+        finally:
             return False

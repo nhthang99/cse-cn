@@ -1,6 +1,7 @@
 import sys
 import threading
 from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtCore import pyqtSlot
 
 from server.Server import Server
 from gui.ServerGUI import Ui_Server
@@ -27,12 +28,7 @@ class MainWindow(QMainWindow):
         self.ui.btnStartServer.clicked.connect(self.startServer)
         self.ui.btnStopServer.clicked.connect(self.stopServer)
 
-# Threading nguyen cai hafm startServer nay ne
     def startServer(self):
-        # ghi zo day ne
-        threading.Thread(target=self.thread())
-
-    def thread(self):
         self.ui.btnStartServer.setDisabled(True)
         self.ui.btnStopServer.setEnabled(True)
         host = self.getHost()
@@ -53,11 +49,13 @@ class MainWindow(QMainWindow):
             self.ui.edtHost.setReadOnly(False)
             self.ui.edtPort.setReadOnly(False)
 
+    @pyqtSlot()
     def updateMessage(self, message):
         if message:
             self.modelMessage.messages.append((False, message))
             self.modelMessage.layoutChanged.emit()
 
+    @pyqtSlot()
     def updateFriend(self, friend):
         if friend:
             self.modelFriend.messages.append((False, friend))

@@ -1,0 +1,4 @@
+PEER_INFO_TAG = 'peer_info'
+PEER_NAME_TAG = 'peer_name'
+PEER_HOST_TAG = 'peer_host'
+PEER_PORT_TAG = 'peer_port'

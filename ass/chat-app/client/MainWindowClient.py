@@ -1,4 +1,4 @@
-import sys, re
+import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
 from PyQt5.QtGui import QPixmap, QStandardItem, QStandardItemModel
 
@@ -6,7 +6,12 @@ from gui.ClientGUI import Ui_MainWindow as WindowChat
 from gui.LoginGUI import Ui_MainWindow as WindowLogin
 from client.Client import Client
 
+client = None
+
+
 class MainWindowChat(QMainWindow):
+
+    global client
 
     def __init__(self, username):
         super(MainWindowChat, self).__init__()
@@ -22,7 +27,7 @@ class MainWindowChat(QMainWindow):
     def changeAvatar(self, avatar):
         avatar = QPixmap(avatar)
         self.ui.ivAvatar.setPixmap(avatar)
-    
+
     def getUsername(self):
         return self.ui.txtUsername.text()
 
@@ -35,15 +40,15 @@ class MainWindowChat(QMainWindow):
     def setupSendMessage(self):
         pass
 
+
 class MainWindowLogin(QMainWindow):
 
-    def __init__(self):
-        super(MainWindowLogin, self).__init__()
+    def __init__(self, parent=None):
+        QMainWindow.__init__(self, parent)
+        self.ui = WindowLogin()
         self.initUI()
 
-
     def initUI(self):
-        self.ui = WindowLogin()
         self.ui.setupUi(self)
         self.ui.btnLogin.clicked.connect(self.startLogin)
 
@@ -52,13 +57,16 @@ class MainWindowLogin(QMainWindow):
         host = self.getHost()
         port = self.getPort()
         try:
-            client = Client(username, host, port)
-            client.connectToServer()
+            # global client
             self.windowChat = MainWindowChat(username)
+            client = Client(username, host, port, self.windowChat)
+            client.connectToServer()
+            client.start()
+            client.change_friend_list.connect(self.windowChat.setupFriendsList)
             self.windowChat.show()
             MainWindowLogin.close(self)
         except:
-            self.showMessageBox("Error", "Can't connect to server %s:%d" %(host, port))
+            self.showMessageBox("Error", "Can't connect to server %s:%d" % (host, port))
 
     def getUsername(self):
         username = self.ui.edtUsername.text()
@@ -74,7 +82,6 @@ class MainWindowLogin(QMainWindow):
         else:
             self.showMessageBox("Error", "Please enter server's host ...\n Try to again")
 
-
     def getPort(self):
         port = self.ui.edtPort.text()
         if port:
@@ -84,6 +91,7 @@ class MainWindowLogin(QMainWindow):
 
     def showMessageBox(self, title, msg):
         return QMessageBox.about(self, title, msg)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

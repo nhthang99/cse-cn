@@ -1,62 +1,63 @@
 #!/usr/bin/env python3
-"""Server for multithreaded (asynchronous) chat application."""
-from socket import AF_INET, socket, SOCK_STREAM
+"""Server for multi-threaded (asynchronous) chat application."""
+import socket, sys
 from threading import Thread
-import re
+from model import Decode, Encode
 
 
 def accept_incoming_connections():
     """Sets up handling for incoming clients."""
     while True:
-        client, client_address = SERVER.accept()
-        print("%s:%s has connected." % client_address)
-        client.send(bytes("Greetings from the cave! Now type your name and press enter!", "utf8"))
-        addresses[client] = client_address
-        Thread(target=handle_client, args=(client, client_address[0])).start()
+        client, client_address = server.accept()
+        socketPeerList.append(client)
+        Thread(target=handle_client, args=(client, client_address)).start()
 
-def isExistUsername(username):
-    if username in clients.keys():
-        return True
-    else:
-        return False
 
-def handle_client(client,client_host):  # Takes client socket as argument.
+def handle_client(client,client_address):
     """Handles a single client connection."""
 
-    data = client.recv(BUFSIZ).decode("utf8")
-    print(data)
-    name_format = re.match(r'<p>(.*)</p>', data, re.M | re.I)
-    if name_format:
-        info = name_format.group()[3:-4].split(':')
-        username = info[0]
-        port = int(info[1])
-        if isExistUsername(username):
-            client.send(bytes('<ExistUsername>', "utf8"))
-        else:
-            welcome = 'Welcome %s:%d! If you ever want to quit, type {quit} to exit.' %(username, port)
-            client.send(bytes(welcome, "utf8"))
-            clients[username] = (client_host, port)
-            print('clients: ', clients)
+    while True:
+        data = client.recv(BUFSIZ).decode("utf8")
+        if data:
+            username, port = Decode.decode_peer_name(data)
+            host = client_address[0]
+            print("%s:%s:%s has connected." % (username, client_address[0], client_address[1]))
+            peerList.append([username, host, int(port)])
+            info_peers = Encode.encode_peer_info_list(peerList)
+            Thread(target=broadcast, args=(info_peers, )).start()
 
-    else:
-        pass
+
+def close(server, socketPeerList):
+    server.close()
+    for socketPeer in socketPeerList:
+        socketPeer.close()
+
+
+def broadcast(data):
+    for peer in socketPeerList:
+        peer.send(bytes(data, "utf8"))
 
         
-clients = {}
-addresses = {}
-
+peerList = []
+socketPeerList = []
 HOST = '127.0.0.1'
-PORT = 8888
-BUFSIZ = 1024
+PORT = 8881
+BUFSIZ = 4096
 ADDR = (HOST, PORT)
+isRunning = True
 
-SERVER = socket(AF_INET, SOCK_STREAM)
-SERVER.bind(ADDR)
 
 if __name__ == "__main__":
-    SERVER.listen(5)
-    print("Waiting for connection...")
-    ACCEPT_THREAD = Thread(target=accept_incoming_connections)
-    ACCEPT_THREAD.start()
-    ACCEPT_THREAD.join()
-    SERVER.close()
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        server.bind(ADDR)
+        server.listen(5)
+        print("Waiting for connection ...")
+        accept_thread = Thread(target=accept_incoming_connections)
+        accept_thread.start()
+        accept_thread.join()
+    except socket.error as e:
+        print("Can't start server ...\n")
+        print("Caused by: " + str(e))
+
+    sys.exit(close(server, socketPeerList))
