@@ -1,6 +1,6 @@
 import xmltodict
 from model.Tags import *
-
+from model.Decode import *
 
 def encode_peer_name(username, port):
     xml = {
@@ -24,5 +24,7 @@ def encode_peer_info_list(lst):
 
     for xml in xml_dict:
         xml_parse += '<p>' + xml + '</p>'
-    print(xml_parse)
+
     return xml_parse
+
+
