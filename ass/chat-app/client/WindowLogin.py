@@ -33,14 +33,15 @@ class WindowLogin(QMainWindow):
                 self.dialogChangeUsername()
             else:
                 self.windowChat.setupFriendsList(self.client.usernameList)
+
+            # Track changeing Friend List
+            self.client.change_friend_list.connect(self.windowChat.setupFriendsList)
+            self.client.start()
+            self.windowChat.show()
+            self.close()
         except:
             self.showMessageBox("Error", "Can't connect to server %s:%d" % (host, port))
-
-        # Track changeing Friend List
-        self.client.change_friend_list.connect(self.windowChat.setupFriendsList)
-        self.client.start()
-        self.windowChat.show()
-        WindowLogin.close(self)
+            # self.close()
 
     def getUsername(self):
         username = self.ui.edtUsername.text()

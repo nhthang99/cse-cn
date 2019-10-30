@@ -6,22 +6,25 @@ class PeerServer(Thread):
     BUFF_SIZE = 4096
     NUM_PEER_LISTEN = 5
 
-    def __init__(self, src_name, dest_name, host, port):
+    def __init__(self, host, port):
         super().__init__()
-        self.src_name = src_name
-        self.dest_name = dest_name
+        # self.src_name = src_name
+        # self.dest_name = dest_name
         self.host = host
         self.port = port
         self.peer_connections = []
         self.isRunning = True
         self.socket_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.startSocket(host, port)
 
     def startSocket(self, host, port):
         try:
             self.socket_server.bind((host, port))
             self.socket_server.listen(self.NUM_PEER_LISTEN)
+            print(True)
         except socket.error as e:
             print(e)
+            print(False)
             self.socket_server.close()
             sys.exit()
 

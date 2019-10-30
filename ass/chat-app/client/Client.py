@@ -1,4 +1,4 @@
-import socket, sys, time
+import socket, sys
 from random import randint
 from model import Encode, Decode, Tags
 from PyQt5.QtCore import QThread, pyqtSignal
