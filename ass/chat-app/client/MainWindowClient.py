@@ -1,6 +1,7 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QInputDialog, QLineEdit
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QInputDialog, QLineEdit, QFileDialog
 from PyQt5.QtGui import QPixmap, QStandardItem, QStandardItemModel
+from PyQt5.QtCore import Qt, QModelIndex
 
 from gui.ClientGUI import Ui_MainWindow as WindowChat
 from gui.LoginGUI import Ui_MainWindow as WindowLogin
@@ -10,45 +11,60 @@ from model import emoji
 
 class MainWindowChat(QMainWindow):
 
-    def __init__(self, username):
+    def __init__(self, username, client):
         super(MainWindowChat, self).__init__()
         self.username = username
+        self.client = client
         self.initUI()
 
     def initUI(self):
         self.ui = WindowChat()
         self.ui.setupUi(self)
+        self.model = QStandardItemModel()
+        self.ui.lvFriend.setModel(self.model)
         self.ui.txtUsername.setText(self.username)
-        self.ui.btnSend.clicked.connect(self.setupSendMessage)
-        self.ui.etxtMessage.returnPressed.connect(self.setMessage)
+        self.ui.btnSend.clicked.connect(self.sendMessage)
+        self.ui.etxtMessage.returnPressed.connect(self.sendMessage)
+        self.ui.lvFriend.doubleClicked[QModelIndex].connect(self.setupChat)
 
-    def setMessage(self):
+    def setupChat(self, index):
+        item = self.model.itemFromIndex(index)
+        peer_name = item.text()
+        for peer in self.client.peerList:
+            if peer[0] == peer_name:
+                self.startChatWithPeer()
+
+    def startChatWithPeer(self):
+        pass
+
+    def sendMessage(self):
         msg = self.ui.etxtMessage.text()
         self.ui.btnSend.setText(emoji.replace(msg))
 
-    def changeAvatar(self, avatar):
-        avatar = QPixmap(avatar)
-        self.ui.ivAvatar.setPixmap(avatar)
+    def changeProfileImage(self):
+        fileName = QFileDialog.getOpenFileName(None, "Select Image", "", "Image Files (*.png *.jpg *jpeg *.bmp)")  # Ask for file
+        if fileName:  # If the user gives a file
+            pixmap = QPixmap(fileName)  # Setup pixmap with the provided image
+            pixmap = pixmap.scaled(self.imageLbl.width(), self.imageLbl.height(), Qt.KeepAspectRatio)  # Scale pixmap
+            self.ui.ivAvatar.setPixmap(pixmap) # Set the pixmap onto the label
+            self.ui.ivAvatar.setAlignment(Qt.AlignCenter)  # Align the label to center
 
     def getUsername(self):
         return self.ui.txtUsername.text()
 
     def setupFriendsList(self, friendsList):
-        model = QStandardItemModel()
-        self.ui.lvFriend.setModel(model)
-        if self.getUsername() in friendsList:
-            friendsList.remove(self.getUsername())
+        self.model.clear()
         for friend in friendsList:
-            model.appendRow(QStandardItem(friend))
-
-    def setupSendMessage(self):
-        pass
+            if friend != self.getUsername():
+                self.model.appendRow(QStandardItem(friend))
 
 
 class MainWindowLogin(QMainWindow):
 
     def __init__(self, parent=None):
         QMainWindow.__init__(self, parent)
+        self.client = None
+        self.windowChat = None
         self.ui = WindowLogin()
         self.initUI()
 
@@ -61,8 +77,8 @@ class MainWindowLogin(QMainWindow):
         host = self.getHost()
         port = self.getPort()
         try:
-            self.windowChat = MainWindowChat(username)
-            self.client = Client(username, host, port, self.windowChat)
+            self.client = Client(username, host, port)
+            self.windowChat = MainWindowChat(username, self.client)
 
             # Username is empty or somethings
             isConnectionFail = self.client.connectToServer()
@@ -70,14 +86,14 @@ class MainWindowLogin(QMainWindow):
                 self.dialogChangeUsername()
             else:
                 self.windowChat.setupFriendsList(self.client.usernameList)
-            # Track changeing Friend List
-            # self.client.usernameList.remove(self.getUsername())
-            self.client.change_friend_list.connect(self.windowChat.setupFriendsList)
-            self.client.start()
-            self.windowChat.show()
-            MainWindowLogin.close(self)
         except:
             self.showMessageBox("Error", "Can't connect to server %s:%d" % (host, port))
+
+        # Track changeing Friend List
+        self.client.change_friend_list.connect(self.windowChat.setupFriendsList)
+        self.client.start()
+        self.windowChat.show()
+        MainWindowLogin.close(self)
 
     def getUsername(self):
         username = self.ui.edtUsername.text()
