@@ -1,71 +1,18 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QInputDialog, QLineEdit, QFileDialog
-from PyQt5.QtGui import QPixmap, QStandardItem, QStandardItemModel
-from PyQt5.QtCore import Qt, QModelIndex
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QInputDialog, QLineEdit
 
-from gui.ClientGUI import Ui_MainWindow as WindowChat
-from gui.LoginGUI import Ui_MainWindow as WindowLogin
+from gui.LoginGUI import Ui_MainWindow
 from client.Client import Client
-from model import emoji
+from client.WindowChat import WindowChat
 
 
-class MainWindowChat(QMainWindow):
-
-    def __init__(self, username, client):
-        super(MainWindowChat, self).__init__()
-        self.username = username
-        self.client = client
-        self.initUI()
-
-    def initUI(self):
-        self.ui = WindowChat()
-        self.ui.setupUi(self)
-        self.model = QStandardItemModel()
-        self.ui.lvFriend.setModel(self.model)
-        self.ui.txtUsername.setText(self.username)
-        self.ui.btnSend.clicked.connect(self.sendMessage)
-        self.ui.etxtMessage.returnPressed.connect(self.sendMessage)
-        self.ui.lvFriend.doubleClicked[QModelIndex].connect(self.setupChat)
-
-    def setupChat(self, index):
-        item = self.model.itemFromIndex(index)
-        peer_name = item.text()
-        for peer in self.client.peerList:
-            if peer[0] == peer_name:
-                self.startChatWithPeer()
-
-    def startChatWithPeer(self):
-        pass
-
-    def sendMessage(self):
-        msg = self.ui.etxtMessage.text()
-        self.ui.btnSend.setText(emoji.replace(msg))
-
-    def changeProfileImage(self):
-        fileName = QFileDialog.getOpenFileName(None, "Select Image", "", "Image Files (*.png *.jpg *jpeg *.bmp)")  # Ask for file
-        if fileName:  # If the user gives a file
-            pixmap = QPixmap(fileName)  # Setup pixmap with the provided image
-            pixmap = pixmap.scaled(self.imageLbl.width(), self.imageLbl.height(), Qt.KeepAspectRatio)  # Scale pixmap
-            self.ui.ivAvatar.setPixmap(pixmap) # Set the pixmap onto the label
-            self.ui.ivAvatar.setAlignment(Qt.AlignCenter)  # Align the label to center
-
-    def getUsername(self):
-        return self.ui.txtUsername.text()
-
-    def setupFriendsList(self, friendsList):
-        self.model.clear()
-        for friend in friendsList:
-            if friend != self.getUsername():
-                self.model.appendRow(QStandardItem(friend))
-
-
-class MainWindowLogin(QMainWindow):
+class WindowLogin(QMainWindow):
 
     def __init__(self, parent=None):
         QMainWindow.__init__(self, parent)
         self.client = None
         self.windowChat = None
-        self.ui = WindowLogin()
+        self.ui = Ui_MainWindow()
         self.initUI()
 
     def initUI(self):
@@ -78,7 +25,7 @@ class MainWindowLogin(QMainWindow):
         port = self.getPort()
         try:
             self.client = Client(username, host, port)
-            self.windowChat = MainWindowChat(username, self.client)
+            self.windowChat = WindowChat(username, self.client)
 
             # Username is empty or somethings
             isConnectionFail = self.client.connectToServer()
@@ -93,7 +40,7 @@ class MainWindowLogin(QMainWindow):
         self.client.change_friend_list.connect(self.windowChat.setupFriendsList)
         self.client.start()
         self.windowChat.show()
-        MainWindowLogin.close(self)
+        WindowLogin.close(self)
 
     def getUsername(self):
         username = self.ui.edtUsername.text()
@@ -136,6 +83,6 @@ class MainWindowLogin(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    windowLogin = MainWindowLogin()
+    windowLogin = WindowLogin()
     windowLogin.show()
     sys.exit(app.exec_())

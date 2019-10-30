@@ -1,7 +1,7 @@
 from threading import Thread
 import socket, sys
 
-class SrcPeer(Thread):
+class PeerServer(Thread):
 
     BUFF_SIZE = 4096
     NUM_PEER_LISTEN = 5

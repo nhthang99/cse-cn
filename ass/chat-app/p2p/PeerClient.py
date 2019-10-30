@@ -1,5 +1,5 @@
 import socket
 from threading import Thread
 
-class DestPeer(Thread):
+class PeerClient(Thread):
     pass
