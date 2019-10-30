@@ -1,4 +1,4 @@
-import socket, sys
+import socket, sys, time
 from random import randint
 from model import Encode, Decode, Tags
 from PyQt5.QtCore import QThread, pyqtSignal
@@ -35,6 +35,8 @@ class Client(QThread):
                 return True
             else:
                 # Username is valid
+                # self.change_friend_list.emit(self.usernameList)
+                self.send_peer_info_to_server(self.username, self.generateRandomPort())
                 return False
 
     def send_peer_info_to_server(self, username, port):
@@ -53,9 +55,11 @@ class Client(QThread):
         while self.isRunning:
             try:
                 data = self.client_socket.recv(self.RECV_SIZE).decode("utf8")
-                # print(data)
-                # peerList = Decode.decode_peer_info_list(data)
-
+                peerList = Decode.decode_peer_info_list(data)
+                print(peerList)
+                self.usernameList = [peer[0] for peer in peerList]
+                print(self.usernameList)
+                self.change_friend_list.emit(self.usernameList)
                 # self.window_chat.setupFriendsList(usernameListFriend)
             except socket.error as e:
                 print(e)

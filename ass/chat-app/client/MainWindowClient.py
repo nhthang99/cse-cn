@@ -5,6 +5,7 @@ from PyQt5.QtGui import QPixmap, QStandardItem, QStandardItemModel
 from gui.ClientGUI import Ui_MainWindow as WindowChat
 from gui.LoginGUI import Ui_MainWindow as WindowLogin
 from client.Client import Client
+from model import emoji
 
 
 class MainWindowChat(QMainWindow):
@@ -19,6 +20,11 @@ class MainWindowChat(QMainWindow):
         self.ui.setupUi(self)
         self.ui.txtUsername.setText(self.username)
         self.ui.btnSend.clicked.connect(self.setupSendMessage)
+        self.ui.etxtMessage.returnPressed.connect(self.setMessage)
+
+    def setMessage(self):
+        msg = self.ui.etxtMessage.text()
+        self.ui.btnSend.setText(emoji.replace(msg))
 
     def changeAvatar(self, avatar):
         avatar = QPixmap(avatar)
@@ -30,6 +36,8 @@ class MainWindowChat(QMainWindow):
     def setupFriendsList(self, friendsList):
         model = QStandardItemModel()
         self.ui.lvFriend.setModel(model)
+        if self.getUsername() in friendsList:
+            friendsList.remove(self.getUsername())
         for friend in friendsList:
             model.appendRow(QStandardItem(friend))
 
@@ -55,12 +63,17 @@ class MainWindowLogin(QMainWindow):
         try:
             self.windowChat = MainWindowChat(username)
             self.client = Client(username, host, port, self.windowChat)
-            isExistUsername = self.client.connectToServer()
-            if isExistUsername:
-                self.dialogChangeUsername()
 
-            self.client.start()
+            # Username is empty or somethings
+            isConnectionFail = self.client.connectToServer()
+            if isConnectionFail:
+                self.dialogChangeUsername()
+            else:
+                self.windowChat.setupFriendsList(self.client.usernameList)
+            # Track changeing Friend List
+            # self.client.usernameList.remove(self.getUsername())
             self.client.change_friend_list.connect(self.windowChat.setupFriendsList)
+            self.client.start()
             self.windowChat.show()
             MainWindowLogin.close(self)
         except:
@@ -92,11 +105,13 @@ class MainWindowLogin(QMainWindow):
         if okPressed and new_name not in self.client.usernameList:
             self.windowChat.username = new_name
             self.windowChat.ui.txtUsername.setText(new_name)
+            self.windowChat.setupFriendsList(self.client.usernameList)
             port = self.client.generateRandomPort()
             self.client.send_peer_info_to_server(new_name, port)
         else:
             self.showMessageBox("Invalid", "Username in use")
             self.dialogChangeUsername()
+        return new_name
 
 
     def showMessageBox(self, title, msg):

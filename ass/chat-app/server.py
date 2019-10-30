@@ -29,6 +29,8 @@ def handle_client(client,client_address):
                 host = client_address[0]
                 print("%s:%s:%s has connected." % (username, client_address[0], client_address[1]))
                 peerList.append([username, host, int(port)])
+            info_peers = Encode.encode_peer_info_list(peerList)
+            broadcast(info_peers)
             print(peerList)
 
 
