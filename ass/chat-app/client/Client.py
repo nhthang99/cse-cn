@@ -40,8 +40,8 @@ class Client(QThread):
                 return False
 
     def run(self):
-        while self.isRunning:
-            self.receive()
+        # while self.isRunning:
+        self.receive()
 
     def receive(self):
         while self.isRunning:

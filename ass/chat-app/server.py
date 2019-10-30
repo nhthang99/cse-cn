@@ -34,7 +34,6 @@ def handle_client(client,client_address):
             print(peerList)
 
 
-
 def close(server, socketPeerList):
     server.close()
     for socketPeer in socketPeerList:
