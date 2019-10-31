@@ -24,7 +24,7 @@ class Client(QThread):
         peerList = Decode.decode_peer_info_list(data)
 
         # First peer join in app
-        if peerList == Tags.EMPTY_PEER_TAG:
+        if peerList == [[None, None, None]]:
             self.send_peer_info_to_server(self.username, self.generateRandomPort())
         # App contained multiple people
         else:

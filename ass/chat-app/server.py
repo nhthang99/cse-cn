@@ -44,10 +44,22 @@ def broadcast(data):
     for peer in socketPeerList:
         peer.send(bytes(data, "utf8"))
 
+
+def get_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        # doesn't even have to be reachable
+        s.connect(('10.255.255.255', 1))
+        IP = s.getsockname()[0]
+    except:
+        IP = '127.0.0.1'
+    finally:
+        s.close()
+    return IP
         
 peerList = []
 socketPeerList = []
-HOST = '127.0.0.1'
+HOST = get_ip()
 PORT = 8888
 BUFSIZ = 4096
 ADDR = (HOST, PORT)
@@ -59,6 +71,7 @@ if __name__ == "__main__":
     try:
         server.bind(ADDR)
         server.listen(5)
+        print("Server start with %s:%d" %(HOST, PORT))
         print("Waiting for connection ...")
         accept_thread = Thread(target=accept_incoming_connections)
         accept_thread.start()

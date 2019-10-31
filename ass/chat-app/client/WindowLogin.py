@@ -1,4 +1,4 @@
-import sys
+import sys, socket
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QInputDialog, QLineEdit
 
 from gui.LoginGUI import Ui_MainWindow
@@ -17,6 +17,7 @@ class WindowLogin(QMainWindow):
 
     def initUI(self):
         self.ui.setupUi(self)
+        self.ui.edtHost.setText(self.getIp())
         self.ui.btnLogin.clicked.connect(self.startLogin)
 
     def startLogin(self):
@@ -25,7 +26,7 @@ class WindowLogin(QMainWindow):
         port = self.getPort()
         try:
             self.client = Client(username, host, port)
-            self.windowChat = WindowChat(username, self.client)
+            self.windowChat = WindowChat(username)
             # Username is empty or somethings
             isConnectionFail = self.client.connectToServer()
             if isConnectionFail:
@@ -79,6 +80,18 @@ class WindowLogin(QMainWindow):
 
     def showMessageBox(self, title, msg):
         return QMessageBox.about(self, title, msg)
+
+    def getIp(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            # doesn't even have to be reachable
+            s.connect(('10.255.255.255', 1))
+            IP = s.getsockname()[0]
+        except:
+            IP = '127.0.0.1'
+        finally:
+            s.close()
+        return IP
 
 
 if __name__ == "__main__":

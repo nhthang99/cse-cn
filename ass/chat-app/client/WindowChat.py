@@ -1,3 +1,5 @@
+import socket
+
 from gui.ClientGUI import Ui_MainWindow
 from PyQt5.QtWidgets import QMainWindow, QFileDialog
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, QPixmap
@@ -8,10 +10,11 @@ from model import emoji
 
 class WindowChat(QMainWindow):
 
-    def __init__(self, username, client):
+    def __init__(self, username):
         super(WindowChat, self).__init__()
         self.username = username
-        self.client = client
+        self.isRunning = False
+        self.peer_socket = None
         self.peerList = []
         self.ui = Ui_MainWindow()
         self.model = QStandardItemModel()
@@ -20,20 +23,19 @@ class WindowChat(QMainWindow):
     def initUI(self):
         self.ui.setupUi(self)
         self.ui.lvFriend.setModel(self.model)
-        self.createSocketServer()
         # Setup event
         self.ui.txtUsername.setText(self.username)
-        self.ui.btnSend.clicked.connect(self.sendMessage)
+        self.ui.btnSend.clicked.connect(self.createSocketServer)
         self.ui.etxtMessage.returnPressed.connect(self.sendMessage)
         self.ui.lvFriend.doubleClicked[QModelIndex].connect(self.setupChat)
 
-    def createSocketServer(self):
-        pass
+    def createSocketServer(self, host, port):
+        self.peer_socket = PeerServer(host, port)
 
     def setupChat(self, index):
         item = self.model.itemFromIndex(index)
         peer_name = item.text()
-        for peer in self.client.peerList:
+        for peer in self.peerList:
             if peer[0] == peer_name:
                 pass
 
@@ -53,8 +55,13 @@ class WindowChat(QMainWindow):
         return self.ui.txtUsername.text()
 
     def setupFriendsList(self, friendsList):
-        self.model.clear()
-        for friend in friendsList:
-            if friend[0] != self.getUsername():
-                self.model.appendRow(QStandardItem(friend[0]))
-        self.peerList = friendsList
+        if friendsList:
+            self.model.clear()
+            self.peerList = friendsList
+            print(friendsList)
+            for friend in friendsList:
+                if friend[0] != self.getUsername():
+                    self.model.appendRow(QStandardItem(friend[0]))
+                elif not self.isRunning:
+                    self.isRunning = True
+                    self.createSocketServer(friend[1], friend[2])

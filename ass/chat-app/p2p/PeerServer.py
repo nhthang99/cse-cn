@@ -8,37 +8,33 @@ class PeerServer(Thread):
 
     def __init__(self, host, port):
         super().__init__()
-        # self.src_name = src_name
-        # self.dest_name = dest_name
         self.host = host
-        self.port = port
+        self.port = int(port)
         self.peer_connections = []
         self.isRunning = True
         self.socket_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.startSocket(host, port)
+        self.startSocket()
 
-    def startSocket(self, host, port):
+    def startSocket(self):
         try:
-            self.socket_server.bind((host, port))
+            self.socket_server.bind((self.host, self.port))
             self.socket_server.listen(self.NUM_PEER_LISTEN)
-            print(True)
         except socket.error as e:
             print(e)
-            print(False)
             self.socket_server.close()
             sys.exit()
 
-    def run(self):
-        self.receive_data()
-
-    def accept_incoming_peer(self):
-        while self.isRunning:
-            (socket_peer, (addr_peer, port_peer)) = self.socket_server.accept()
-            self.peer_connections.append([self.dest_name, socket_peer, addr_peer, port_peer])
-            Thread(target=self.receive_data, args=(socket_peer,))
-
-    def receive_data(self, socket_peer):
-        while self.isRunning:
-            data = socket_peer.recv(self.BUFF_SIZE).decode("utf8")
-            print(data)
+    # def run(self):
+    #     self.receive_data()
+    #
+    # def accept_incoming_peer(self):
+    #     while self.isRunning:
+    #         (socket_peer, (addr_peer, port_peer)) = self.socket_server.accept()
+    #         self.peer_connections.append([addr_peer, port_peer])
+    #         Thread(target=self.receive_data, args=(socket_peer,))
+    #
+    # def receive_data(self, socket_peer):
+    #     while self.isRunning:
+    #         data = socket_peer.recv(self.BUFF_SIZE).decode("utf8")
+    #         print(data)
 
