@@ -26,19 +26,18 @@ class WindowLogin(QMainWindow):
         try:
             self.client = Client(username, host, port)
             self.windowChat = WindowChat(username, self.client)
-
             # Username is empty or somethings
             isConnectionFail = self.client.connectToServer()
             if isConnectionFail:
                 self.dialogChangeUsername()
             else:
-                self.windowChat.setupFriendsList(self.client.usernameList)
+                self.windowChat.setupFriendsList(self.client.peerList)
 
             # Track changeing Friend List
             self.client.change_friend_list.connect(self.windowChat.setupFriendsList)
             self.client.start()
             self.windowChat.show()
-            self.close()
+            WindowLogin.close(self)
         except:
             self.showMessageBox("Error", "Can't connect to server %s:%d" % (host, port))
             # self.close()

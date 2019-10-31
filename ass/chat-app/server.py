@@ -22,7 +22,7 @@ def handle_client(client,client_address):
     while True:
         data = client.recv(BUFSIZ).decode("utf8")
         if data:
-            username, port = Decode.decode_peer_name(data)
+            username, port = Decode.decode_peer_info(data)
             if not username and not port:
                 break
             else:

@@ -51,7 +51,7 @@ class Client(QThread):
                 self.peerList = Decode.decode_peer_info_list(data)
                 self.usernameList = [peer[0] for peer in self.peerList]
                 # Track changing List Friend
-                self.change_friend_list.emit(self.usernameList)
+                self.change_friend_list.emit(self.peerList)
             except socket.error as e:
                 print(e)
                 self.stop()
@@ -62,7 +62,7 @@ class Client(QThread):
         self.client_socket.close()
 
     def send_peer_info_to_server(self, username, port):
-        info = Encode.encode_peer_name(username, port)
+        info = Encode.encode_peer_info(username, port)
         self.send_to_server(info)
 
 

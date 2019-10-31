@@ -12,6 +12,7 @@ class WindowChat(QMainWindow):
         super(WindowChat, self).__init__()
         self.username = username
         self.client = client
+        self.peerList = []
         self.ui = Ui_MainWindow()
         self.model = QStandardItemModel()
         self.initUI()
@@ -27,14 +28,7 @@ class WindowChat(QMainWindow):
         self.ui.lvFriend.doubleClicked[QModelIndex].connect(self.setupChat)
 
     def createSocketServer(self):
-        for peer in self.client.peerList:
-            peer_name = peer[0]
-            peer_host = peer[1]
-            peer_port = int(peer[2])
-            print(peer_name, self.username)
-            if peer_name == self.username:
-                print(peer_host, peer_port)
-                self.peer_server = PeerServer(peer_host, peer_port)
+        pass
 
     def setupChat(self, index):
         item = self.model.itemFromIndex(index)
@@ -61,5 +55,6 @@ class WindowChat(QMainWindow):
     def setupFriendsList(self, friendsList):
         self.model.clear()
         for friend in friendsList:
-            if friend != self.getUsername():
-                self.model.appendRow(QStandardItem(friend))
+            if friend[0] != self.getUsername():
+                self.model.appendRow(QStandardItem(friend[0]))
+        self.peerList = friendsList
