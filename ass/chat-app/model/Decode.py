@@ -32,3 +32,11 @@ def decode_peer_info_list(code):
             return result
     except:
         return None
+
+
+def decode_check_alive(code):
+    try:
+        parse = xmltodict.parse(code, process_namespaces=True)
+        return parse[PEER_ALIVE_TAG]
+    except:
+        return None

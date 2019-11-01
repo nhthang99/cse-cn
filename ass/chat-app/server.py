@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Server for multi-threaded (asynchronous) chat application."""
-import socket, sys
+import socket, sys, time
 from threading import Thread
 from model import Decode, Encode
 
@@ -14,6 +14,12 @@ def accept_incoming_connections():
             info_peers = Encode.encode_peer_info_list(peerList)
             broadcast(info_peers)
         Thread(target=handle_client, args=(client, client_address)).start()
+
+
+def check_for_connection():
+    while True:
+        broadcast(Encode.encode_check_alive())
+        time.sleep(5)
 
 
 def handle_client(client,client_address):
@@ -87,8 +93,13 @@ if __name__ == "__main__":
         print("Server start with %s:%d" %(HOST, PORT))
         print("Waiting for connection ...")
         accept_thread = Thread(target=accept_incoming_connections)
+        # accept_thread.setDaemon(True)
+        check_connect_thread = Thread(target=check_for_connection)
+        # check_connect_thread.setDaemon(True)
         accept_thread.start()
+        check_connect_thread.start()
         accept_thread.join()
+        check_connect_thread.join()
     except socket.error as e:
         print("Can't start server ...\n")
         print("Caused by: " + str(e))

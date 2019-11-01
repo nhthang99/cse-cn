@@ -51,3 +51,9 @@ def encode_peer_info_list(lst):
     open_peer_list_tag = '<' + PEER_LIST_TAG + '>'
     close_peer_list_tag = '</' + PEER_LIST_TAG + '>'
     return open_peer_list_tag + xml_parse + close_peer_list_tag
+
+def encode_check_alive():
+    xml = {
+        PEER_ALIVE_TAG: PEER_ALIVE_TAG
+    }
+    return xmltodict.unparse(xml, full_document=False, short_empty_elements=True)

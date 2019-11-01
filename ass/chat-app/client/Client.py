@@ -1,5 +1,6 @@
 import socket, sys
 from random import randint
+from datetime import datetime
 from model import Encode, Decode, Tags
 from PyQt5.QtCore import QThread, pyqtSignal
 
@@ -44,14 +45,26 @@ class Client(QThread):
         self.receive()
 
     def receive(self):
+        curr_time = datetime.now().timestamp()
         while self.isRunning:
             try:
                 data = self.client_socket.recv(self.RECV_SIZE).decode("utf8")
 
                 self.peerList = Decode.decode_peer_info_list(data)
-                self.usernameList = [peer[0] for peer in self.peerList]
-                # Track changing List Friend
-                self.change_friend_list.emit(self.peerList)
+                if isinstance(self.peerList, list):
+                    # self.usernameList = [peer[0] for peer in self.peerList]
+                    # Track changing List Friend
+                    self.change_friend_list.emit(self.peerList)
+                else:
+                    alive = Decode.decode_check_alive(data)
+                    if alive == Tags.PEER_ALIVE_TAG:
+                        received_time = datetime.now().timestamp()
+                        period = received_time - curr_time
+                        curr_time = received_time
+                        if period > 10.0:
+                            print("server is died")
+                            self.stop()
+
             except socket.error as e:
                 print(e)
                 self.stop()
