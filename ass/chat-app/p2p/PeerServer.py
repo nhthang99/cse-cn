@@ -51,6 +51,9 @@ class PeerServer:
             print(data)
             # self.message_received.emit(data)
 
+    def send_to_client(self, peer_name, msg):
+        if peer_name in self.peer_connections.keys():
+            self.peer_connections[peer_name].send(bytes(msg, "utf8"))
 
     def close(self):
         self.isRunning = False

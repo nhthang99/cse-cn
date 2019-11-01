@@ -16,6 +16,8 @@ class WindowChat(QMainWindow):
         self.username = username
         self.isRunning = False
         self.peer_server = None
+        self.isServer = False
+        self.curr_peer_chat = None
         self.peerList = []
         self.ui = Ui_MainWindow()
         self.modelFriend = QStandardItemModel()
@@ -36,18 +38,26 @@ class WindowChat(QMainWindow):
         self.peer_server = PeerServer(host, port)
 
     def setupChat(self, index):
+        self.isServer = False
         item = self.modelFriend.itemFromIndex(index)
         peer_name = item.text()
         for peer in self.peerList:
             if peer[0] == peer_name:
-                self.peer_client = PeerClient(self.username, peer[1], int(peer[2]))
-                self.peer_client.handle_connect_chat()
+                if peer_name in self.peer_server.peer_connections.keys():
+                    self.isServer = True
+                    self.curr_peer_chat = peer_name
+                else:
+                    self.peer_client = PeerClient(self.username, peer[1], int(peer[2]))
+                    self.peer_client.handle_connect_chat()
 
     def sendMessage(self):
         msg = emoji.replace(self.ui.etxtMessage.text())
         self.ui.etxtMessage.clear()
         self.updateMessage('\t\t\t\tMe: ' + msg)
-        self.peer_client.send_to_peer(msg)
+        if self.isServer:
+            self.peer_server.send_to_client(self.curr_peer_chat, msg)
+        else:
+            self.peer_client.send_to_peer(msg)
 
 
     def changeProfileImage(self):
