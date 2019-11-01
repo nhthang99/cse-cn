@@ -41,6 +41,7 @@ def close(server, socketPeerList):
 
 
 def broadcast(data):
+    isAnyPeerDisconnected = False
     for client in socketPeerList:
         try:
             client[0].send(bytes(data, "utf8"))
@@ -50,8 +51,10 @@ def broadcast(data):
                 if peer[0] == client[1]:
                     peerList.remove(peer)
                     socketPeerList.remove(client)
-            info_peers = Encode.encode_peer_info_list(peerList)
-            broadcast(info_peers)
+            isAnyPeerDisconnected = True
+    if isAnyPeerDisconnected:
+        info_peers = Encode.encode_peer_info_list(peerList)
+        broadcast(info_peers)
 
 
 
