@@ -1,12 +1,14 @@
 import socket
 from threading import Thread
+from model import Encode
 
 class PeerClient:
 
     BUFF_SIZE = 4096
 
-    def __init__(self, host, port):
+    def __init__(self, peer_name, host, port):
         super().__init__()
+        self.peer_name = peer_name
         self.host = host
         self.port = port
         self.isRunning = False
@@ -32,9 +34,9 @@ class PeerClient:
     def handle_connect_chat(self):
         try:
             self.socket_client.connect((self.host, self.port))
-            # self.peer_connections.append(client_socket)
-            data = self.socket_client.recv(1048).decode("utf8")
-            print("data from server: " + data)
+            info = Encode.encode_start_session(self.peer_name)
+            self.send_to_peer(info)
+            print(info)
             # Thread(target=self.receive_data, args=(client_socket,)).start()
         except socket.error:
             print(str(socket.error))

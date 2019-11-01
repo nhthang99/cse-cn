@@ -40,7 +40,7 @@ class WindowChat(QMainWindow):
         peer_name = item.text()
         for peer in self.peerList:
             if peer[0] == peer_name:
-                self.peer_client = PeerClient(peer[1], int(peer[2]))
+                self.peer_client = PeerClient(self.username, peer[1], int(peer[2]))
                 self.peer_client.handle_connect_chat()
 
     def sendMessage(self):
