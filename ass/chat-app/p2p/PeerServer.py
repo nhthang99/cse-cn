@@ -24,17 +24,29 @@ class PeerServer(Thread):
             self.socket_server.close()
             sys.exit()
 
-    # def run(self):
-    #     self.receive_data()
-    #
-    # def accept_incoming_peer(self):
-    #     while self.isRunning:
-    #         (socket_peer, (addr_peer, port_peer)) = self.socket_server.accept()
-    #         self.peer_connections.append([addr_peer, port_peer])
-    #         Thread(target=self.receive_data, args=(socket_peer,))
-    #
-    # def receive_data(self, socket_peer):
-    #     while self.isRunning:
-    #         data = socket_peer.recv(self.BUFF_SIZE).decode("utf8")
-    #         print(data)
+    def run(self):
+        self.accept_incoming_peer()
+
+    def accept_incoming_peer(self):
+        # while self.isRunning:
+        (peer_client, (addr_peer, port_peer)) = self.socket_server.accept()
+        self.peer_connections.append(peer_client)
+        Thread(target=self.receive_data, args=(peer_client,))
+
+    def receive_data(self, socket_peer):
+        while self.isRunning:
+            # if socket_peer:
+            data = socket_peer.recv(self.BUFF_SIZE).decode("utf8")
+            print(data)
+            # else:
+            #     pass
+                # if socket_peer in self.peer_connections:
+                #     self.peer_connections.remove(socket_peer)
+                # socket_peer.close()
+
+    def close(self):
+        self.isRunning = False
+        for peer in self.peer_connections:
+            peer.close()
+        self.socket_server.close()
 
