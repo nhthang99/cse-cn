@@ -1,8 +1,10 @@
 from threading import Thread
-import socket, sys
+from PyQt5.QtCore import pyqtSignal
+import socket
 
-class PeerServer(Thread):
 
+class PeerServer:
+    message_received = pyqtSignal(str)
     BUFF_SIZE = 4096
     NUM_PEER_LISTEN = 5
 
@@ -10,39 +12,42 @@ class PeerServer(Thread):
         super().__init__()
         self.host = host
         self.port = int(port)
+        self.socket_server = None
         self.peer_connections = []
         self.isRunning = True
-        self.socket_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.startSocket()
 
     def startSocket(self):
+        if self.socket_server:
+            self.socket_server.close()
+            self.socket_server = None
+            self.isRunning = False
+
         try:
+            self.socket_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.socket_server.bind((self.host, self.port))
             self.socket_server.listen(self.NUM_PEER_LISTEN)
+            self.isRunning = True
+            Thread(target=self.listen_peer_incoming).start()
+            # self.listen_peer_incoming()
         except socket.error as e:
             print(e)
-            self.socket_server.close()
-            sys.exit()
 
-    def run(self):
-        self.accept_incoming_peer()
-
-    def accept_incoming_peer(self):
-        # while self.isRunning:
-        (peer_client, (addr_peer, port_peer)) = self.socket_server.accept()
-        self.peer_connections.append(peer_client)
-        Thread(target=self.receive_data, args=(peer_client,))
-
-    def receive_data(self, socket_peer):
+    def listen_peer_incoming(self):
         while self.isRunning:
-            # if socket_peer:
-            data = socket_peer.recv(self.BUFF_SIZE).decode("utf8")
-            print(data)
-            # else:
-            #     pass
-                # if socket_peer in self.peer_connections:
-                #     self.peer_connections.remove(socket_peer)
-                # socket_peer.close()
+            (client_socket, (client_addr, client_port)) = self.socket_server.accept()
+            client_socket.send(bytes("hello " + client_addr, "utf8"))
+            # client_socket.recv(self.BUFF_SIZE).decode("utf8")
+            print("%s:%s connected"%(client_addr, client_port))
+            self.peer_connections.append(client_socket)
+            self.receive_data(client_socket)
+            # Thread(target=self.receive_data, args=(client_socket,)).start()
+
+    def receive_data(self, client_socket):
+        while True:
+            data = client_socket.recv(self.BUFF_SIZE).decode("utf8")
+            # self.message_received.emit(data)
+
 
     def close(self):
         self.isRunning = False

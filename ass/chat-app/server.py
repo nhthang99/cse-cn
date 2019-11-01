@@ -73,7 +73,7 @@ def get_ip():
 peerList = []
 socketPeerList = []
 HOST = get_ip()
-PORT = 8888
+PORT = 8880
 BUFSIZ = 4096
 ADDR = (HOST, PORT)
 isRunning = True

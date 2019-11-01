@@ -1,4 +1,4 @@
-import socket
+from threading import Thread
 
 from gui.ClientGUI import Ui_MainWindow
 from PyQt5.QtWidgets import QMainWindow, QFileDialog
@@ -6,6 +6,7 @@ from PyQt5.QtGui import QStandardItemModel, QStandardItem, QPixmap
 from PyQt5.QtCore import QModelIndex, Qt
 
 from p2p.PeerServer import PeerServer
+from p2p.PeerClient import PeerClient
 from model import emoji
 
 class WindowChat(QMainWindow):
@@ -14,34 +15,40 @@ class WindowChat(QMainWindow):
         super(WindowChat, self).__init__()
         self.username = username
         self.isRunning = False
-        self.peer_socket = None
+        self.peer_server = None
         self.peerList = []
         self.ui = Ui_MainWindow()
-        self.model = QStandardItemModel()
+        self.modelFriend = QStandardItemModel()
+        self.modelMessage = QStandardItemModel()
         self.initUI()
 
     def initUI(self):
         self.ui.setupUi(self)
-        self.ui.lvFriend.setModel(self.model)
+        self.ui.lvFriend.setModel(self.modelFriend)
+        self.ui.lvBodyMessage.setModel(self.modelMessage)
         # Setup event
         self.ui.txtUsername.setText(self.username)
-        self.ui.btnSend.clicked.connect(self.createSocketServer)
+        self.ui.btnSend.clicked.connect(self.sendMessage)
         self.ui.etxtMessage.returnPressed.connect(self.sendMessage)
         self.ui.lvFriend.doubleClicked[QModelIndex].connect(self.setupChat)
 
     def createSocketServer(self, host, port):
-        self.peer_socket = PeerServer(host, port)
+        self.peer_server = PeerServer(host, port)
 
     def setupChat(self, index):
-        item = self.model.itemFromIndex(index)
+        item = self.modelFriend.itemFromIndex(index)
         peer_name = item.text()
         for peer in self.peerList:
             if peer[0] == peer_name:
-                pass
+                self.peer_client = PeerClient(peer[1], int(peer[2]))
+                self.peer_client.handle_connect_chat()
 
     def sendMessage(self):
-        msg = self.ui.etxtMessage.text()
-        self.ui.btnSend.setText(emoji.replace(msg))
+        msg = emoji.replace(self.ui.etxtMessage.text())
+        self.ui.etxtMessage.clear()
+        self.updateMessage('\t\t\t\tMe: ' + msg)
+        self.peer_client.send_to_peer(msg)
+
 
     def changeProfileImage(self):
         fileName, _ = QFileDialog.getOpenFileName(None, "Select Image", "", "Image Files (*.png *.jpg *jpeg *.bmp)")  # Ask for file
@@ -56,12 +63,17 @@ class WindowChat(QMainWindow):
 
     def setupFriendsList(self, friendsList):
         if friendsList:
-            self.model.clear()
+            self.modelFriend.clear()
             self.peerList = friendsList
-            print(friendsList)
             for friend in friendsList:
                 if friend[0] != self.getUsername():
-                    self.model.appendRow(QStandardItem(friend[0]))
+                    self.modelFriend.appendRow(QStandardItem(friend[0]))
                 elif not self.isRunning:
                     self.isRunning = True
-                    self.createSocketServer(friend[1], friend[2])
+                    self.createSocketServer(friend[1], int(friend[2]))
+
+    def updateMessage(self, msg):
+        if msg:
+            item = QStandardItem(msg)
+            self.modelMessage.appendRow(item)
+
