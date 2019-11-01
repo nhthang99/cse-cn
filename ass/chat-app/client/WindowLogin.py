@@ -38,7 +38,6 @@ class WindowLogin(QMainWindow):
             self.client.change_friend_list.connect(self.windowChat.setupFriendsList)
             self.client.start()
             self.windowChat.show()
-            # self.windowChat.peer_server.message_received.connect(self.updateMessage)
             self.close()
 
         except:

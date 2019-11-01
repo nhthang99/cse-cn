@@ -1,41 +1,31 @@
 import socket
 from threading import Thread
 from model import Encode
+from PyQt5.QtCore import QObject, pyqtSignal
 
-class PeerClient:
+class PeerClient(QObject):
 
+    message_received = pyqtSignal(str)
     BUFF_SIZE = 4096
 
-    def __init__(self, peer_name, host, port):
+    def __init__(self, peer_name_src, host, port):
         super().__init__()
-        self.peer_name = peer_name
+        self.peer_name_src = peer_name_src
         self.host = host
         self.port = port
         self.socket_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.handle_connect_chat()
 
-    # def connect(self):
-    #     self.socket_client.connect((self.host, self.port))
-    #     self.isRunning = True
-    #     print("connect: ", self.isRunning)
-    #
-    # def run(self):
-    #     self.receive()
-    #
     def receive_data(self):
         while True:
             data = self.socket_client.recv(self.BUFF_SIZE).decode("utf8")
-            print(data)
-    #
-    # def send(self, user, msg):
-    #     print("send", self.socket_client)
-    #     self.socket_client.send(bytes(user + ':'+ msg, "utf8"))
+            self.message_received.emit(data)
 
     def handle_connect_chat(self):
         try:
             self.socket_client.connect((self.host, self.port))
-            info = Encode.encode_start_session(self.peer_name)
+            info = Encode.encode_start_session(self.peer_name_src)
             self.send_to_peer(info)
-            print(info)
             Thread(target=self.receive_data).start()
         except socket.error:
             print(str(socket.error))

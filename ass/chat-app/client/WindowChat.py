@@ -16,18 +16,19 @@ class WindowChat(QMainWindow):
         self.username = username
         self.isRunning = False
         self.peer_server = None
+        self.peer_client = None
         self.isServer = False
         self.curr_peer_chat = None
         self.peerList = []
+        self.peer_chatting = {}
         self.ui = Ui_MainWindow()
         self.modelFriend = QStandardItemModel()
-        self.modelMessage = QStandardItemModel()
         self.initUI()
 
     def initUI(self):
         self.ui.setupUi(self)
         self.ui.lvFriend.setModel(self.modelFriend)
-        self.ui.lvBodyMessage.setModel(self.modelMessage)
+        self.ui.btnSend.setDisabled(True)
         # Setup event
         self.ui.txtUsername.setText(self.username)
         self.ui.btnSend.clicked.connect(self.sendMessage)
@@ -36,9 +37,11 @@ class WindowChat(QMainWindow):
 
     def createSocketServer(self, host, port):
         self.peer_server = PeerServer(host, port)
+        self.peer_server.message_received.connect(self.updateMessage)
 
     def setupChat(self, index):
         self.isServer = False
+        self.ui.btnSend.setEnabled(True)
         item = self.modelFriend.itemFromIndex(index)
         peer_name = item.text()
         for peer in self.peerList:
@@ -48,7 +51,7 @@ class WindowChat(QMainWindow):
                     self.curr_peer_chat = peer_name
                 else:
                     self.peer_client = PeerClient(self.username, peer[1], int(peer[2]))
-                    self.peer_client.handle_connect_chat()
+                    self.peer_client.message_received.connect(self.updateMessage)
 
     def sendMessage(self):
         msg = emoji.replace(self.ui.etxtMessage.text())
@@ -83,7 +86,5 @@ class WindowChat(QMainWindow):
                     self.createSocketServer(friend[1], int(friend[2]))
 
     def updateMessage(self, msg):
-        if msg:
-            item = QStandardItem(msg)
-            self.modelMessage.appendRow(item)
+        self.ui.lvBodyMessage.addItem(msg)
 
