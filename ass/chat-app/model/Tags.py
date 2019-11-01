@@ -1,3 +1,4 @@
+PEER_SESSION_TAG = 'session'
 PEER_LIST_TAG = 'peer_list'
 PEER_INFO_TAG = 'peer_info'
 PEER_NAME_TAG = 'peer_name'

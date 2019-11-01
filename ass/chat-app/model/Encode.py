@@ -12,6 +12,15 @@ def encode_peer_info(username, port):
     return xmltodict.unparse(xml, full_document=False, short_empty_elements=True)
 
 
+def encode_start_session(username):
+    xml = {
+        PEER_SESSION_TAG: {
+            PEER_NAME_TAG: username
+        }
+    }
+    return xmltodict.unparse(xml, full_document=False, short_empty_elements=True)
+
+
 def encode_peer_info_list(lst):
     xml_dict = []
     xml_parse = ''

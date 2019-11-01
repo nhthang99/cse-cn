@@ -2,18 +2,26 @@ import xmltodict
 from model.Tags import *
 
 
-def decode_peer_info(encode):
+def decode_peer_info(code):
     try:
-        parse = xmltodict.parse(encode, process_namespaces=True)
+        parse = xmltodict.parse(code, process_namespaces=True)
         return parse[PEER_INFO_TAG][PEER_NAME_TAG], parse[PEER_INFO_TAG][PEER_PORT_TAG]
     except:
         return None, None
 
 
-def decode_peer_info_list(encode):
+def decode_start_session(code):
+    try:
+        parse = xmltodict.parse(code, process_namespaces=True)
+        return parse[PEER_SESSION_TAG][PEER_NAME_TAG]
+    except:
+        return None
+
+
+def decode_peer_info_list(code):
     result = []
     try:
-        parse = xmltodict.parse(encode, process_namespaces=True)
+        parse = xmltodict.parse(code, process_namespaces=True)
         if isinstance(parse[PEER_LIST_TAG][PEER_INFO_TAG], list):
             for p in parse[PEER_LIST_TAG][PEER_INFO_TAG]:
                 result.append([p[PEER_NAME_TAG], p[PEER_HOST_TAG], p[PEER_PORT_TAG]])
