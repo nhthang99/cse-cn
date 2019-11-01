@@ -33,7 +33,7 @@ class WindowChat(QMainWindow):
         self.ui.txtUsername.setText(self.username)
         self.ui.btnSend.clicked.connect(self.sendMessage)
         self.ui.etxtMessage.returnPressed.connect(self.sendMessage)
-        self.ui.lvFriend.doubleClicked[QModelIndex].connect(self.setupChat)
+        self.ui.lvFriend.clicked[QModelIndex].connect(self.setupChat)
 
     def createSocketServer(self, host, port):
         self.peer_server = PeerServer(host, port)
@@ -50,8 +50,15 @@ class WindowChat(QMainWindow):
                     self.isServer = True
                     self.curr_peer_chat = peer_name
                 else:
-                    self.peer_client = PeerClient(self.username, peer[1], int(peer[2]))
-                    self.peer_client.message_received.connect(self.updateMessage)
+                    if peer[0] not in self.peer_chatting.keys():
+                        self.peer_client = PeerClient(self.username, peer[1], int(peer[2]))
+                        self.peer_chatting[peer[0]] = self.peer_client.socket_client
+                        self.peer_client.message_received.connect(self.updateMessage)
+                    self.curr_peer_chat = peer_name
+
+    def createClientSocket(self, username, host, port):
+        self.peer_client = PeerClient(username, host, int(port))
+        self.peer_client.message_received.connect(self.updateMessage)
 
     def sendMessage(self):
         msg = emoji.replace(self.ui.etxtMessage.text())
@@ -60,7 +67,8 @@ class WindowChat(QMainWindow):
         if self.isServer:
             self.peer_server.send_to_client(self.curr_peer_chat, msg)
         else:
-            self.peer_client.send_to_peer(msg)
+            socket_client = self.peer_chatting[self.curr_peer_chat]
+            socket_client.send(bytes(msg, "utf8"))
 
 
     def changeProfileImage(self):

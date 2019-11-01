@@ -25,11 +25,7 @@ class PeerClient(QObject):
         try:
             self.socket_client.connect((self.host, self.port))
             info = Encode.encode_start_session(self.peer_name_src)
-            self.send_to_peer(info)
+            self.socket_client.send(bytes(info, "utf8"))
             Thread(target=self.receive_data).start()
         except socket.error:
             print(str(socket.error))
-
-    def send_to_peer(self, msg):
-        self.socket_client.send(bytes(msg, "utf8"))
-

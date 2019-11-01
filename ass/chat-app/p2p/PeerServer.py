@@ -15,7 +15,6 @@ class PeerServer(QObject):
         self.port = int(port)
         self.socket_server = None
         self.peer_connections = {}
-        # self.message = []
         self.isRunning = True
         self.startSocket()
 
@@ -31,7 +30,6 @@ class PeerServer(QObject):
             self.socket_server.listen(self.NUM_PEER_LISTEN)
             self.isRunning = True
             Thread(target=self.listen_peer_incoming).start()
-            # self.listen_peer_incoming()
         except socket.error as e:
             print(e)
 
@@ -45,7 +43,7 @@ class PeerServer(QObject):
             self.receive_data(client_socket)
 
     def receive_data(self, client_socket):
-        while True:
+        while self.isRunning:
             data = client_socket.recv(self.BUFF_SIZE).decode("utf8")
             self.message_received.emit(data)
 
