@@ -10,7 +10,7 @@ def accept_incoming_connections():
     while True:
         client, client_address = server.accept()
         if client:
-            socketPeerList.append(client)
+            socketPeerList.append([client])
             info_peers = Encode.encode_peer_info_list(peerList)
             broadcast(info_peers)
         Thread(target=handle_client, args=(client, client_address)).start()
@@ -27,22 +27,32 @@ def handle_client(client,client_address):
                 break
             else:
                 host = client_address[0]
-                print("%s:%s:%s has connected." % (username, client_address[0], client_address[1]))
+                print("%s has connected." % username)
                 peerList.append([username, host, int(port)])
+                socketPeerList[-1].append(username)
             info_peers = Encode.encode_peer_info_list(peerList)
             broadcast(info_peers)
-            print(peerList)
 
 
 def close(server, socketPeerList):
     server.close()
     for socketPeer in socketPeerList:
-        socketPeer.close()
+        socketPeer[0].close()
 
 
 def broadcast(data):
-    for peer in socketPeerList:
-        peer.send(bytes(data, "utf8"))
+    for client in socketPeerList:
+        try:
+            client[0].send(bytes(data, "utf8"))
+        except socket.error:
+            print(client[1], "is offline")
+            for peer in peerList:
+                if peer[0] == client[1]:
+                    peerList.remove(peer)
+                    socketPeerList.remove(client)
+            info_peers = Encode.encode_peer_info_list(peerList)
+            broadcast(info_peers)
+
 
 
 def get_ip():
