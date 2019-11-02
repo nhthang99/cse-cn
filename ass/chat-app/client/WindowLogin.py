@@ -70,7 +70,7 @@ class WindowLogin(QMainWindow):
         if okPressed and new_name not in self.client.usernameList:
             self.windowChat.username = new_name
             self.windowChat.ui.txtUsername.setText(new_name)
-            self.windowChat.setupFriendsList(self.client.usernameList)
+            self.windowChat.setupFriendsList(self.client.peerList)
             port = self.client.generateRandomPort()
             self.client.send_peer_info_to_server(new_name, port)
         else:

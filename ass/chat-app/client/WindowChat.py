@@ -1,7 +1,7 @@
 from threading import Thread
 
 from gui.ClientGUI import Ui_MainWindow
-from PyQt5.QtWidgets import QMainWindow, QFileDialog
+from PyQt5.QtWidgets import QMainWindow, QFileDialog, QStackedWidget, QListWidget
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, QPixmap
 from PyQt5.QtCore import QModelIndex, Qt
 
@@ -22,28 +22,34 @@ class WindowChat(QMainWindow):
         self.peerList = []
         self.peer_chatting = {}
         self.ui = Ui_MainWindow()
-        self.modelFriend = QStandardItemModel()
+        # self.modelFriend = QStandardItemModel()
+        self.stackMessages = QStackedWidget()
         self.initUI()
 
     def initUI(self):
         self.ui.setupUi(self)
-        self.ui.lvFriend.setModel(self.modelFriend)
+        # self.ui.lvFriend.setModel(self.modelFriend)
+        # self.ui.lvFriend.curr
         self.ui.btnSend.setDisabled(True)
         # Setup event
         self.ui.txtUsername.setText(self.username)
         self.ui.btnSend.clicked.connect(self.sendMessage)
         self.ui.etxtMessage.returnPressed.connect(self.sendMessage)
-        self.ui.lvFriend.clicked[QModelIndex].connect(self.setupChat)
+        self.ui.lvFriend.itemSelectionChanged.connect(self.setupChat)
 
     def createSocketServer(self, host, port):
         self.peer_server = PeerServer(host, port)
         self.peer_server.message_received.connect(self.updateMessage)
 
-    def setupChat(self, index):
+    def createListViewShowMessage(self):
+        listViewMessage = QListWidget()
+        listViewMessage.insertItems(["hello", "haha", "hihi"])
+
+    def setupChat(self):
         self.isServer = False
         self.ui.btnSend.setEnabled(True)
-        item = self.modelFriend.itemFromIndex(index)
-        peer_name = item.text()
+        peer_name = self.ui.lvFriend.selectedItems()[0].text()
+        print(peer_name)
         for peer in self.peerList:
             if peer[0] == peer_name:
                 if peer_name in self.peer_server.peer_connections.keys():
@@ -84,11 +90,13 @@ class WindowChat(QMainWindow):
 
     def setupFriendsList(self, friendsList):
         if friendsList:
-            self.modelFriend.clear()
+            # self.modelFriend.clear()
+            self.ui.lvFriend.clear()
             self.peerList = friendsList
             for friend in friendsList:
                 if friend[0] != self.getUsername():
-                    self.modelFriend.appendRow(QStandardItem(friend[0]))
+                    # self.modelFriend.appendRow(QStandardItem(friend[0]))
+                    self.ui.lvFriend.addItem(friend[0])
                 elif not self.isRunning:
                     self.isRunning = True
                     self.createSocketServer(friend[1], int(friend[2]))

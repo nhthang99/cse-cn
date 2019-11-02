@@ -57,13 +57,14 @@ class Client(QThread):
                     self.change_friend_list.emit(self.peerList)
                 else:
                     alive = Decode.decode_check_alive(data)
-                    if alive == Tags.PEER_ALIVE_TAG:
-                        received_time = datetime.now().timestamp()
-                        period = received_time - curr_time
-                        curr_time = received_time
-                        if period > 10.0:
-                            print("server is died")
-                            self.stop()
+                    received_time = datetime.now().timestamp()
+                    period = received_time - curr_time
+                    curr_time = received_time
+                    if alive == Tags.PEER_ALIVE_TAG and period < 10.0:
+                        pass
+                    else:
+                        print("server is died")
+                        self.stop()
 
             except socket.error as e:
                 print(e)
