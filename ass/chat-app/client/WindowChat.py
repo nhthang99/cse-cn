@@ -1,9 +1,7 @@
-from threading import Thread
-
 from gui.ClientGUI import Ui_MainWindow
-from PyQt5.QtWidgets import QMainWindow, QFileDialog, QStackedWidget, QListWidget
-from PyQt5.QtGui import QStandardItemModel, QStandardItem, QPixmap
-from PyQt5.QtCore import QModelIndex, Qt
+from PyQt5.QtWidgets import QMainWindow, QFileDialog, QStackedWidget, QListWidget, QMessageBox
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtCore import Qt
 
 from p2p.PeerServer import PeerServer
 from p2p.PeerClient import PeerClient
@@ -22,15 +20,11 @@ class WindowChat(QMainWindow):
         self.peerList = []
         self.peer_chatting = {}
         self.ui = Ui_MainWindow()
-        # self.modelFriend = QStandardItemModel()
         self.stackMessages = QStackedWidget()
         self.initUI()
 
     def initUI(self):
         self.ui.setupUi(self)
-        # self.ui.lvFriend.setModel(self.modelFriend)
-        # self.ui.lvFriend.curr
-        self.ui.btnSend.setDisabled(True)
         # Setup event
         self.ui.txtUsername.setText(self.username)
         self.ui.btnSend.clicked.connect(self.sendMessage)
@@ -47,8 +41,8 @@ class WindowChat(QMainWindow):
 
     def setupChat(self):
         self.isServer = False
-        self.ui.btnSend.setEnabled(True)
         peer_name = self.ui.lvFriend.selectedItems()[0].text()
+        print(peer_name)
         for peer in self.peerList:
             if peer[0] == peer_name:
                 if peer_name in self.peer_server.peer_connections.keys():
@@ -66,14 +60,20 @@ class WindowChat(QMainWindow):
         self.peer_client.message_received.connect(self.updateMessage)
 
     def sendMessage(self):
-        msg = emoji.replace(self.ui.etxtMessage.text())
-        self.ui.etxtMessage.clear()
-        self.updateMessage('\t\t\t\tMe: ' + msg)
-        if self.isServer:
-            self.peer_server.send_to_client(self.curr_peer_chat, msg)
+        peer_name = self.ui.lvFriend.selectedItems()
+        # must select friend before chat
+        if peer_name:
+            msg = emoji.replace(self.ui.etxtMessage.text())
+            self.ui.etxtMessage.clear()
+            self.updateMessage('\t\t\t\tMe: ' + msg)
+            if self.isServer:
+                self.peer_server.send_to_client(self.curr_peer_chat, msg)
+            else:
+                socket_client = self.peer_chatting[self.curr_peer_chat]
+                socket_client.send(bytes(msg, "utf8"))
         else:
-            socket_client = self.peer_chatting[self.curr_peer_chat]
-            socket_client.send(bytes(msg, "utf8"))
+            self.ui.etxtMessage.clear()
+            QMessageBox.about(self, "Warning", "You are talking to yourself. Choose someone to be less alone.")
 
 
     def changeProfileImage(self):
@@ -89,16 +89,15 @@ class WindowChat(QMainWindow):
 
     def setupFriendsList(self, friendsList):
         if friendsList:
-            # self.modelFriend.clear()
             self.ui.lvFriend.clear()
             self.peerList = friendsList
             for friend in friendsList:
                 if friend[0] != self.getUsername():
-                    # self.modelFriend.appendRow(QStandardItem(friend[0]))
                     self.ui.lvFriend.addItem(friend[0])
                 elif not self.isRunning:
                     self.isRunning = True
                     self.createSocketServer(friend[1], int(friend[2]))
+            self.ui.lvFriend.setCurrentRow(0)
 
     def updateMessage(self, msg):
         self.ui.lvBodyMessage.addItem(msg)

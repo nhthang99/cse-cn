@@ -40,7 +40,8 @@ class PeerServer(QObject):
             peer_name_client = Decode.decode_start_session(info_peer)
             print("%s:%s connected"%(client_addr, client_port))
             self.peer_connections[peer_name_client] = client_socket
-            self.receive_data(client_socket)
+            # self.receive_data(client_socket)
+            Thread(target=self.receive_data, args=(client_socket, )).start()
 
     def receive_data(self, client_socket):
         while self.isRunning:
