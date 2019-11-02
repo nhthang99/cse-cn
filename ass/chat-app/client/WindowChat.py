@@ -25,6 +25,7 @@ class WindowChat(QMainWindow):
 
     def initUI(self):
         self.ui.setupUi(self)
+        self.setFixedSize(780, 560)
         # Setup event
         self.ui.txtUsername.setText(self.username)
         self.ui.btnSend.clicked.connect(self.sendMessage)
@@ -64,13 +65,14 @@ class WindowChat(QMainWindow):
         # must select friend before chat
         if peer_name:
             msg = emoji.replace(self.ui.etxtMessage.text())
+            my_name = self.getUsername()
             self.ui.etxtMessage.clear()
             self.updateMessage('\t\t\t\tMe: ' + msg)
             if self.isServer:
-                self.peer_server.send_to_client(self.curr_peer_chat, msg)
+                self.peer_server.send_to_client(self.curr_peer_chat, my_name + ': ' + msg)
             else:
                 socket_client = self.peer_chatting[self.curr_peer_chat]
-                socket_client.send(bytes(msg, "utf8"))
+                socket_client.send(bytes(my_name + ': ' + msg, "utf8"))
         else:
             self.ui.etxtMessage.clear()
             QMessageBox.about(self, "Warning", "You are talking to yourself. Choose someone to be less alone.")

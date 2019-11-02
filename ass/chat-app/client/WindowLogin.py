@@ -16,6 +16,7 @@ class WindowLogin(QMainWindow):
         self.initUI()
 
     def initUI(self):
+        self.setFixedSize(310, 166)
         self.ui.setupUi(self)
         self.ui.edtHost.setText(self.getIp())
         self.ui.btnLogin.clicked.connect(self.startLogin)
