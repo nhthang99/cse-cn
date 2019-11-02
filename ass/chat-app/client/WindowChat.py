@@ -49,14 +49,13 @@ class WindowChat(QMainWindow):
         self.isServer = False
         self.ui.btnSend.setEnabled(True)
         peer_name = self.ui.lvFriend.selectedItems()[0].text()
-        print(peer_name)
         for peer in self.peerList:
             if peer[0] == peer_name:
                 if peer_name in self.peer_server.peer_connections.keys():
                     self.isServer = True
                     self.curr_peer_chat = peer_name
                 else:
-                    if peer[0] not in self.peer_chatting.keys():
+                    if peer_name not in self.peer_chatting.keys():
                         self.peer_client = PeerClient(self.username, peer[1], int(peer[2]))
                         self.peer_chatting[peer[0]] = self.peer_client.socket_client
                         self.peer_client.message_received.connect(self.updateMessage)
