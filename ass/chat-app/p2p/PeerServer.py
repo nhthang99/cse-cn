@@ -1,10 +1,5 @@
 import socket
 from threading import Thread
-<<<<<<< HEAD
-
-=======
-import Decode
->>>>>>> 38dba6a2c9ffefea88b22ef3f96d3ba93e80a695
 from PyQt5.QtCore import pyqtSignal, QObject
 
 import Decode, Encode

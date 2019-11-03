@@ -5,11 +5,7 @@ from PyQt5.QtCore import Qt
 
 from PeerServer import PeerServer
 from PeerClient import PeerClient
-<<<<<<< HEAD
 import Emoji, Encode
-=======
-import emoji
->>>>>>> 38dba6a2c9ffefea88b22ef3f96d3ba93e80a695
 
 class WindowChat(QMainWindow):
 
@@ -42,14 +38,10 @@ class WindowChat(QMainWindow):
 
     def setupChat(self):
         self.isServer = False
-<<<<<<< HEAD
         try:
             peer_name = self.ui.lvFriend.selectedItems()[0].text()
         except:
             return
-=======
-        peer_name = self.ui.lvFriend.selectedItems()[0].text()
->>>>>>> 38dba6a2c9ffefea88b22ef3f96d3ba93e80a695
         for peer in self.peerList:
             if peer[0] == peer_name:
                 if peer_name in self.peer_server.peer_connections.keys():
@@ -66,27 +58,16 @@ class WindowChat(QMainWindow):
         peer_name = self.ui.lvFriend.selectedItems()
         # must select friend before chat
         if peer_name:
-<<<<<<< HEAD
             msg = Emoji.replace(self.ui.etxtMessage.text())
-=======
-            msg = emoji.replace(self.ui.etxtMessage.text())
->>>>>>> 38dba6a2c9ffefea88b22ef3f96d3ba93e80a695
             my_name = self.getUsername()
             self.ui.etxtMessage.clear()
             self.updateMessage('\t\t\t\t' + my_name +': ' + msg)
             if self.isServer:
-<<<<<<< HEAD
                 self.peer_server.send_to_client(my_name, self.curr_peer_chat, msg)
             else:
                 socket_client = self.peer_chatting[self.curr_peer_chat]
                 msg_encode = Encode.encode_message(my_name, msg)
                 socket_client.send(bytes(msg_encode, "utf8"))
-=======
-                self.peer_server.send_to_client(self.curr_peer_chat, my_name + ': ' + msg)
-            else:
-                socket_client = self.peer_chatting[self.curr_peer_chat]
-                socket_client.send(bytes(my_name + ': ' + msg, "utf8"))
->>>>>>> 38dba6a2c9ffefea88b22ef3f96d3ba93e80a695
         else:
             self.ui.etxtMessage.clear()
             QMessageBox.about(self, "Warning", "You are talking to yourself. Choose someone to be less alone.")
