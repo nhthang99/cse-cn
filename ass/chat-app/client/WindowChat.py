@@ -1,11 +1,11 @@
-from gui.ClientGUI import Ui_MainWindow
+from ClientGUI import Ui_MainWindow
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QStackedWidget, QListWidget, QMessageBox
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 
-from p2p.PeerServer import PeerServer
-from p2p.PeerClient import PeerClient
-from model import emoji
+from PeerServer import PeerServer
+from PeerClient import PeerClient
+import emoji
 
 class WindowChat(QMainWindow):
 
@@ -25,6 +25,7 @@ class WindowChat(QMainWindow):
 
     def initUI(self):
         self.ui.setupUi(self)
+        self.setFixedSize(780, 560)
         # Setup event
         self.ui.txtUsername.setText(self.username)
         self.ui.btnSend.clicked.connect(self.sendMessage)
@@ -42,7 +43,6 @@ class WindowChat(QMainWindow):
     def setupChat(self):
         self.isServer = False
         peer_name = self.ui.lvFriend.selectedItems()[0].text()
-        print(peer_name)
         for peer in self.peerList:
             if peer[0] == peer_name:
                 if peer_name in self.peer_server.peer_connections.keys():
@@ -64,13 +64,14 @@ class WindowChat(QMainWindow):
         # must select friend before chat
         if peer_name:
             msg = emoji.replace(self.ui.etxtMessage.text())
+            my_name = self.getUsername()
             self.ui.etxtMessage.clear()
             self.updateMessage('\t\t\t\tMe: ' + msg)
             if self.isServer:
-                self.peer_server.send_to_client(self.curr_peer_chat, msg)
+                self.peer_server.send_to_client(self.curr_peer_chat, my_name + ': ' + msg)
             else:
                 socket_client = self.peer_chatting[self.curr_peer_chat]
-                socket_client.send(bytes(msg, "utf8"))
+                socket_client.send(bytes(my_name + ': ' + msg, "utf8"))
         else:
             self.ui.etxtMessage.clear()
             QMessageBox.about(self, "Warning", "You are talking to yourself. Choose someone to be less alone.")

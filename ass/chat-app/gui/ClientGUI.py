@@ -8,7 +8,8 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
+import sys
+sys.path.append('./imgs')
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -16,7 +17,7 @@ class Ui_MainWindow(object):
         MainWindow.resize(780, 560)
         MainWindow.setAcceptDrops(False)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("../imgs/logo.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("imgs/logo.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
         MainWindow.setAutoFillBackground(True)
         MainWindow.setLocale(QtCore.QLocale(QtCore.QLocale.English, QtCore.QLocale.UnitedStates))
@@ -87,7 +88,7 @@ class Ui_MainWindow(object):
         self.ivAvatar.setFrameShadow(QtWidgets.QFrame.Raised)
         self.ivAvatar.setLineWidth(0)
         self.ivAvatar.setText("")
-        self.ivAvatar.setPixmap(QtGui.QPixmap("../imgs/default_avatar.png"))
+        self.ivAvatar.setPixmap(QtGui.QPixmap("imgs/default_avatar.png"))
         self.ivAvatar.setScaledContents(True)
         self.ivAvatar.setObjectName("ivAvatar")
         MainWindow.setCentralWidget(self.centralwidget)
