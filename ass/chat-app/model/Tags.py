@@ -1,3 +1,4 @@
+FILE_NAME_TAG = 'file_name'
 PEER_CONTENT_MSG_TAG = 'content'
 PEER_MESSAGE_TAG = 'msg'
 PEER_SESSION_TAG = 'session'

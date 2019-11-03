@@ -24,6 +24,16 @@ class PeerClient(QObject):
                 username = msg_decode[0]
                 content = msg_decode[1]
                 self.message_received.emit(username + ': ' + content)
+            file_name = Decode.decode_file_name(data)
+            if file_name:
+                with open(file_name, 'wb') as f:
+                    while True:
+                        data = self.socket_client.recv(self.BUFF_SIZE * 5)
+                        # end_file = Decode.decode_file_name(data)
+                        if not data:
+                            break
+                        f.write(data)
+                        
 
     def handle_connect_chat(self):
         try:

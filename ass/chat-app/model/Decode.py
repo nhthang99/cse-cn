@@ -47,4 +47,10 @@ def decode_message(code):
         return parse[PEER_MESSAGE_TAG][PEER_NAME_TAG], parse[PEER_MESSAGE_TAG][PEER_CONTENT_MSG_TAG]
     except:
         return None
-        
+
+def decode_file_name(code):
+    try:
+        parse = xmltodict.parse(code, process_namespaces=True)
+        return parse[FILE_NAME_TAG]
+    except:
+        return None

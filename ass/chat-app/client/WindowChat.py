@@ -1,3 +1,5 @@
+import timeit, time
+
 from ClientGUI import Ui_MainWindow
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QStackedWidget, QListWidget, QMessageBox
 from PyQt5.QtGui import QPixmap
@@ -64,7 +66,7 @@ class WindowChat(QMainWindow):
             self.ui.etxtMessage.clear()
             self.updateMessage('\t\t\t\t' + my_name +': ' + msg)
             if self.isServer:
-                self.peer_server.send_to_client(my_name, self.curr_peer_chat, msg)
+                self.peer_server.send_message(my_name, self.curr_peer_chat, msg)
             else:
                 socket_client = self.peer_chatting[self.curr_peer_chat]
                 msg_encode = Encode.encode_message(my_name, msg)
@@ -76,13 +78,39 @@ class WindowChat(QMainWindow):
     def openFile(self):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
-        fileName, _ = QFileDialog.getOpenFileName(None, "Select File", "", "All Files (*)", options=options)
-        if fileName:
-            print(fileName)
-            self.sendFile(fileName)
+        filePath, _ = QFileDialog.getOpenFileName(None, "Select File", "", "All Files (*)", options=options)
+        if filePath:
+            self.sendFile(filePath)
     
-    def sendFile(self, fileName):
-        pass
+    def sendFile(self, filePath):
+        peer_dest = self.ui.lvFriend.selectedItems()
+        if peer_dest:
+            my_name = self.getUsername()
+            file_name = filePath.split('/')[-1]
+            if self.isServer:
+                self.peer_server.send_file(my_name, self.curr_peer_chat, file_name, filePath)
+            else:
+                socket_client = self.peer_chatting[self.curr_peer_chat]
+                self.socket_send_file(socket_client, my_name, self.curr_peer_chat, file_name, filePath)
+        else:
+            QMessageBox.about(self, "Warning", "Who do you want to send to?")
+
+    def socket_send_file(self, sock, peer_src, peer_dest, file_name, file_path):
+        file_name_encode = Encode.encode_file_name(file_name)
+
+        sock.send(bytes(file_name_encode, "utf8"))
+        # size_file = os.path.getsize(file_path)
+        with open(file_path, "rb") as f:
+            start = timeit.default_timer()
+            # data = f.read(2048 * 5)
+            # while data:
+            #     sock.send(data)
+            #     data = f.read(2048 * 5)
+            sock.sendfile(f)
+            end = timeit.default_timer()
+            print("Time: ", end - start)
+
+        # sock.send(bytes(file_name_encode))
 
     def changeProfileImage(self):
         options = QFileDialog.Options()
@@ -107,7 +135,7 @@ class WindowChat(QMainWindow):
                 elif not self.isRunning:
                     self.isRunning = True
                     self.createSocketServer(friend[1], int(friend[2]))
-            self.ui.lvFriend.setCurrentRow(0)
+            # self.ui.lvFriend.setCurrentRow(0)
 
     def updateMessage(self, msg):
         self.ui.lvBodyMessage.addItem(msg)

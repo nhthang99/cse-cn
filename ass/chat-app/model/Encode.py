@@ -66,3 +66,9 @@ def encode_message(username, content):
         }
     }
     return xmltodict.unparse(xml, full_document=False, short_empty_elements=True)
+
+def encode_file_name(file_name):
+    xml = {
+        FILE_NAME_TAG: file_name
+    }
+    return xmltodict.unparse(xml, full_document=False, short_empty_elements=True)

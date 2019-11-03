@@ -1,4 +1,4 @@
-import socket
+import socket, os
 from threading import Thread
 from PyQt5.QtCore import pyqtSignal, QObject
 
@@ -52,11 +52,35 @@ class PeerServer(QObject):
                 username = msg_decode[0]
                 content = msg_decode[1]
                 self.message_received.emit(username + ': ' + content)
+            file_name = Decode.decode_file_name(data)
+            if file_name:
+                with open(file_name, 'wb') as f:
+                    while True:
+                        data = client_socket.recv(self.BUFF_SIZE * 5)
+                        # end_file = Decode.decode_file_name(data)
+                        if not data:
+                            break
+                        f.write(data)
 
-    def send_to_client(self, peer_src, peer_dest, msg):
+    def send_message(self, peer_src, peer_dest, msg):
         if peer_dest in self.peer_connections.keys():
             msg_encode = Encode.encode_message(peer_src, msg)
             self.peer_connections[peer_dest].send(bytes(msg_encode, "utf8"))
+
+    def send_file(self, peer_src, peer_dest, file_name, file_path):
+        if peer_dest in self.peer_connections.keys():
+            file_name_encode = Encode.encode_file_name(file_name)
+            peer_socket = self.peer_connections[peer_dest]
+            peer_socket.send(bytes(file_name_encode, "utf8"))
+            # size_file = os.path.getsize(file_path)
+            with open(file_path, "rb") as f:
+                # data = f.read(2048 * 5)
+                # while data:
+                #     peer_socket.send(data)
+                #     data = f.read(2048 * 5)
+                peer_socket.sendfile(f)
+
+            # peer_socket.send(bytes(file_name_encode))
 
     def close(self):
         self.isRunning = False
