@@ -57,3 +57,12 @@ def encode_check_alive():
         PEER_ALIVE_TAG: PEER_ALIVE_TAG
     }
     return xmltodict.unparse(xml, full_document=False, short_empty_elements=True)
+
+def encode_message(username, content):
+    xml = {
+        PEER_MESSAGE_TAG: {
+            PEER_NAME_TAG: username,
+            PEER_CONTENT_MSG_TAG: content
+        }
+    }
+    return xmltodict.unparse(xml, full_document=False, short_empty_elements=True)

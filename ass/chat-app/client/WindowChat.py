@@ -5,7 +5,7 @@ from PyQt5.QtCore import Qt
 
 from PeerServer import PeerServer
 from PeerClient import PeerClient
-import emoji
+import Emoji, Encode
 
 class WindowChat(QMainWindow):
 
@@ -36,13 +36,12 @@ class WindowChat(QMainWindow):
         self.peer_server = PeerServer(host, port)
         self.peer_server.message_received.connect(self.updateMessage)
 
-    def createListViewShowMessage(self):
-        listViewMessage = QListWidget()
-        listViewMessage.insertItems(["hello", "haha", "hihi"])
-
     def setupChat(self):
         self.isServer = False
-        peer_name = self.ui.lvFriend.selectedItems()[0].text()
+        try:
+            peer_name = self.ui.lvFriend.selectedItems()[0].text()
+        except:
+            return
         for peer in self.peerList:
             if peer[0] == peer_name:
                 if peer_name in self.peer_server.peer_connections.keys():
@@ -55,23 +54,20 @@ class WindowChat(QMainWindow):
                         self.peer_client.message_received.connect(self.updateMessage)
                     self.curr_peer_chat = peer_name
 
-    def createClientSocket(self, username, host, port):
-        self.peer_client = PeerClient(username, host, int(port))
-        self.peer_client.message_received.connect(self.updateMessage)
-
     def sendMessage(self):
         peer_name = self.ui.lvFriend.selectedItems()
         # must select friend before chat
         if peer_name:
-            msg = emoji.replace(self.ui.etxtMessage.text())
+            msg = Emoji.replace(self.ui.etxtMessage.text())
             my_name = self.getUsername()
             self.ui.etxtMessage.clear()
-            self.updateMessage('\t\t\t\tMe: ' + msg)
+            self.updateMessage('\t\t\t\t' + my_name +': ' + msg)
             if self.isServer:
-                self.peer_server.send_to_client(self.curr_peer_chat, my_name + ': ' + msg)
+                self.peer_server.send_to_client(my_name, self.curr_peer_chat, msg)
             else:
                 socket_client = self.peer_chatting[self.curr_peer_chat]
-                socket_client.send(bytes(my_name + ': ' + msg, "utf8"))
+                msg_encode = Encode.encode_message(my_name, msg)
+                socket_client.send(bytes(msg_encode, "utf8"))
         else:
             self.ui.etxtMessage.clear()
             QMessageBox.about(self, "Warning", "You are talking to yourself. Choose someone to be less alone.")

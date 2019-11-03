@@ -1,6 +1,6 @@
 import socket
 from threading import Thread
-import Encode
+import Encode, Decode
 from PyQt5.QtCore import QObject, pyqtSignal
 
 class PeerClient(QObject):
@@ -19,7 +19,11 @@ class PeerClient(QObject):
     def receive_data(self):
         while True:
             data = self.socket_client.recv(self.BUFF_SIZE).decode("utf8")
-            self.message_received.emit(data)
+            msg_decode = Decode.decode_message(data)
+            if msg_decode:
+                username = msg_decode[0]
+                content = msg_decode[1]
+                self.message_received.emit(username + ': ' + content)
 
     def handle_connect_chat(self):
         try:

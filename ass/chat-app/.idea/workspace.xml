@@ -3,6 +3,12 @@
   <component name="ChangeListManager">
     <list default="true" id="95f536a0-1844-4dfa-b134-317914cfef42" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/WindowChat.py" beforeDir="false" afterPath="$PROJECT_DIR$/client/WindowChat.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model/Decode.py" beforeDir="false" afterPath="$PROJECT_DIR$/model/Decode.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model/Encode.py" beforeDir="false" afterPath="$PROJECT_DIR$/model/Encode.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model/Tags.py" beforeDir="false" afterPath="$PROJECT_DIR$/model/Tags.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/p2p/PeerClient.py" beforeDir="false" afterPath="$PROJECT_DIR$/p2p/PeerClient.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/p2p/PeerServer.py" beforeDir="false" afterPath="$PROJECT_DIR$/p2p/PeerServer.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -147,12 +153,13 @@
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1,QT_AUTO_SCREEN_SCALE_FACTOR=1" />
+        <env name="QT_DEVICE_PIXEL_RATIO" value="1" />
       </envs>
       <option name="SDK_HOME" value="/usr/bin/python3.6" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/client" />
       <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="false" />
+      <option name="ADD_SOURCE_ROOTS" value="false" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/client/WindowLogin.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />

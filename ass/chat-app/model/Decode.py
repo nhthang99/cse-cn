@@ -40,3 +40,11 @@ def decode_check_alive(code):
         return parse[PEER_ALIVE_TAG]
     except:
         return None
+
+def decode_message(code):
+    try:
+        parse = xmltodict.parse(code, process_namespaces=True)
+        return parse[PEER_MESSAGE_TAG][PEER_NAME_TAG], parse[PEER_MESSAGE_TAG][PEER_CONTENT_MSG_TAG]
+    except:
+        return None
+        

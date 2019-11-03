@@ -6,7 +6,7 @@ from PyQt5.QtCore import QThread, pyqtSignal
 
 
 class Client(QThread):
-    RECV_SIZE = 4096
+    RECV_SIZE = 2048
     change_friend_list = pyqtSignal(list)
 
     def __init__(self, username='', host='127.0.0.1', port=8888, parent=None):

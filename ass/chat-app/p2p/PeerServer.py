@@ -1,7 +1,9 @@
-from threading import Thread
-import Decode
-from PyQt5.QtCore import pyqtSignal, QObject
 import socket
+from threading import Thread
+
+from PyQt5.QtCore import pyqtSignal, QObject
+
+import Decode, Encode
 
 
 class PeerServer(QObject):
@@ -46,11 +48,16 @@ class PeerServer(QObject):
     def receive_data(self, client_socket):
         while self.isRunning:
             data = client_socket.recv(self.BUFF_SIZE).decode("utf8")
-            self.message_received.emit(data)
+            msg_decode = Decode.decode_message(data)
+            if msg_decode:
+                username = msg_decode[0]
+                content = msg_decode[1]
+                self.message_received.emit(username + ': ' + content)
 
-    def send_to_client(self, peer_name, msg):
-        if peer_name in self.peer_connections.keys():
-            self.peer_connections[peer_name].send(bytes(msg, "utf8"))
+    def send_to_client(self, peer_src, peer_dest, msg):
+        if peer_dest in self.peer_connections.keys():
+            msg_encode = Encode.encode_message(peer_src, msg)
+            self.peer_connections[peer_dest].send(bytes(msg_encode, "utf8"))
 
     def close(self):
         self.isRunning = False

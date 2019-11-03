@@ -82,7 +82,7 @@ peerList = []
 socketPeerList = []
 HOST = get_ip()
 PORT = 8888
-BUFSIZ = 4096
+BUFSIZ = 2048
 ADDR = (HOST, PORT)
 isRunning = True
 

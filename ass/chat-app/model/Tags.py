@@ -1,3 +1,5 @@
+PEER_CONTENT_MSG_TAG = 'content'
+PEER_MESSAGE_TAG = 'msg'
 PEER_SESSION_TAG = 'session'
 PEER_LIST_TAG = 'peer_list'
 PEER_INFO_TAG = 'peer_info'
