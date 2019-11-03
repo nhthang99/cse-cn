@@ -3,12 +3,15 @@
   <component name="ChangeListManager">
     <list default="true" id="95f536a0-1844-4dfa-b134-317914cfef42" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+<<<<<<< HEAD
       <change beforePath="$PROJECT_DIR$/client/WindowChat.py" beforeDir="false" afterPath="$PROJECT_DIR$/client/WindowChat.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/model/Decode.py" beforeDir="false" afterPath="$PROJECT_DIR$/model/Decode.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/model/Encode.py" beforeDir="false" afterPath="$PROJECT_DIR$/model/Encode.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/model/Tags.py" beforeDir="false" afterPath="$PROJECT_DIR$/model/Tags.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/p2p/PeerClient.py" beforeDir="false" afterPath="$PROJECT_DIR$/p2p/PeerClient.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/p2p/PeerServer.py" beforeDir="false" afterPath="$PROJECT_DIR$/p2p/PeerServer.py" afterDir="false" />
+=======
+>>>>>>> 38dba6a2c9ffefea88b22ef3f96d3ba93e80a695
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
