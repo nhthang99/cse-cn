@@ -2,7 +2,7 @@ import socket, os
 from threading import Thread
 from PyQt5.QtCore import pyqtSignal, QObject
 
-import Decode, Encode
+from model import Decode, Encode
 
 
 class PeerServer(QObject):

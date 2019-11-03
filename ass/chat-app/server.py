@@ -3,8 +3,8 @@
 import socket, sys, time
 from threading import Thread
 
-sys.path.append('./model')
-import Decode, Encode
+sys.path.append('.')
+from model import Decode, Encode
 
 
 def accept_incoming_connections():

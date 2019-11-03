@@ -1,5 +1,5 @@
 import xmltodict
-from Tags import *
+from model.Tags import *
 
 
 def decode_peer_info(code):

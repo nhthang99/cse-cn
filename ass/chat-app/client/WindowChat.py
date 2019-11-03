@@ -1,12 +1,12 @@
 import os, time
-from ClientGUI import Ui_MainWindow
+from gui.ClientGUI import Ui_MainWindow
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QStackedWidget, QListWidget, QMessageBox
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 
-from PeerServer import PeerServer
-from PeerClient import PeerClient
-import Emoji, Encode
+from p2p.PeerServer import PeerServer
+from p2p.PeerClient import PeerClient
+from model import Emoji, Encode
 
 class WindowChat(QMainWindow):
 

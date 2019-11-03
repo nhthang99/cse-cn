@@ -2,14 +2,14 @@ import sys, socket
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QInputDialog, QLineEdit
 from PyQt5.QtGui import QIcon, QPixmap
 
-locpath = ['./gui', './model', './p2p']
+locpath = ['.']
 for p in locpath:
     if not p in sys.path:
         sys.path.append(p)
 
-from LoginGUI import Ui_MainWindow
-from Client import Client
-from WindowChat import WindowChat
+from gui.LoginGUI import Ui_MainWindow
+from client.Client import Client
+from client.WindowChat import WindowChat
 
 
 class WindowLogin(QMainWindow):

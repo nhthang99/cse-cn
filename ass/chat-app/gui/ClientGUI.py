@@ -9,7 +9,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
-sys.path.append('./imgs')
+# sys.path.append('./imgs')
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -17,7 +17,7 @@ class Ui_MainWindow(object):
         MainWindow.resize(780, 560)
         MainWindow.setAcceptDrops(False)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("imgs/logo.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("../imgs/logo.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
         MainWindow.setAutoFillBackground(True)
         MainWindow.setLocale(QtCore.QLocale(QtCore.QLocale.English, QtCore.QLocale.UnitedStates))
@@ -74,7 +74,7 @@ class Ui_MainWindow(object):
         self.btnOpenFile = QtWidgets.QPushButton(self.frame_4)
         self.btnOpenFile.setGeometry(QtCore.QRect(0, 0, 31, 31))
         self.btnOpenFile.setObjectName("btnOpenFile")
-        self.btnOpenFile.setIcon(QtGui.QIcon('imgs/ic_open_file.png'))
+        self.btnOpenFile.setIcon(QtGui.QIcon('../imgs/ic_open_file.png'))
         self.frame_5 = QtWidgets.QFrame(self.centralwidget)
         self.frame_5.setGeometry(QtCore.QRect(10, 10, 171, 41))
         self.frame_5.setAutoFillBackground(True)
@@ -92,7 +92,7 @@ class Ui_MainWindow(object):
         self.ivAvatar.setFrameShadow(QtWidgets.QFrame.Raised)
         self.ivAvatar.setLineWidth(0)
         self.ivAvatar.setText("")
-        self.ivAvatar.setPixmap(QtGui.QPixmap("imgs/default_avatar.png"))
+        self.ivAvatar.setPixmap(QtGui.QPixmap("../imgs/default_avatar.png"))
         self.ivAvatar.setScaledContents(True)
         self.ivAvatar.setObjectName("ivAvatar")
         MainWindow.setCentralWidget(self.centralwidget)

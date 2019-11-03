@@ -1,7 +1,7 @@
 import socket, sys
 from random import randint
 from datetime import datetime
-import Encode, Decode, Tags
+from model import Encode, Decode, Tags
 from PyQt5.QtCore import QThread, pyqtSignal
 
 

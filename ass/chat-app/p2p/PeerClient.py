@@ -1,6 +1,6 @@
 import socket
 from threading import Thread
-import Encode, Decode
+from model import Encode, Decode
 from PyQt5.QtCore import QObject, pyqtSignal
 
 class PeerClient(QObject):
