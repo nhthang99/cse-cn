@@ -1,11 +1,11 @@
-from gui.ClientGUI import Ui_MainWindow
+from ClientGUI import Ui_MainWindow
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QStackedWidget, QListWidget, QMessageBox
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 
-from p2p.PeerServer import PeerServer
-from p2p.PeerClient import PeerClient
-from model import emoji
+from PeerServer import PeerServer
+from PeerClient import PeerClient
+import emoji
 
 class WindowChat(QMainWindow):
 
@@ -43,7 +43,6 @@ class WindowChat(QMainWindow):
     def setupChat(self):
         self.isServer = False
         peer_name = self.ui.lvFriend.selectedItems()[0].text()
-        print(peer_name)
         for peer in self.peerList:
             if peer[0] == peer_name:
                 if peer_name in self.peer_server.peer_connections.keys():

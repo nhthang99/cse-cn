@@ -2,7 +2,9 @@
 """Server for multi-threaded (asynchronous) chat application."""
 import socket, sys, time
 from threading import Thread
-from model import Decode, Encode
+
+sys.path.append('./model')
+import Decode, Encode
 
 
 def accept_incoming_connections():

@@ -1,5 +1,5 @@
 from threading import Thread
-from model import Decode
+import Decode
 from PyQt5.QtCore import pyqtSignal, QObject
 import socket
 

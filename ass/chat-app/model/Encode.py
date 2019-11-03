@@ -1,5 +1,5 @@
 import xmltodict
-from model.Tags import *
+from Tags import *
 
 
 def encode_peer_info(username, port):
