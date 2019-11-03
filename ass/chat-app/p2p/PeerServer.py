@@ -54,13 +54,22 @@ class PeerServer(QObject):
                 self.message_received.emit(username + ': ' + content)
             file_name = Decode.decode_file_name(data)
             if file_name:
-                with open(file_name, 'wb') as f:
-                    while True:
-                        data = client_socket.recv(self.BUFF_SIZE * 5)
-                        # end_file = Decode.decode_file_name(data)
-                        if not data:
-                            break
-                        f.write(data)
+                # with open(file_name, 'wb') as f:
+                #     data = client_socket.recv(self.BUFF_SIZE)
+                #     while data:
+                #         f.write(data)
+                #         data = client_socket.recv(self.BUFF_SIZE)
+                file_size = client_socket.recv(32).decode("utf8")
+                file_size = int(file_size)
+                file_to_write = open(file_name, 'wb')
+                chunksize = 10240
+                while file_size > 0:
+                    if file_size < chunksize:
+                        chunksize = file_size
+                    data = client_socket.recv(chunksize)
+                    file_to_write.write(data)
+                    file_size -= len(data)
+                file_to_write.close()
 
     def send_message(self, peer_src, peer_dest, msg):
         if peer_dest in self.peer_connections.keys():
@@ -71,7 +80,9 @@ class PeerServer(QObject):
         if peer_dest in self.peer_connections.keys():
             file_name_encode = Encode.encode_file_name(file_name)
             peer_socket = self.peer_connections[peer_dest]
+            file_size = os.path.getsize(file_path)
             peer_socket.send(bytes(file_name_encode, "utf8"))
+            peer_socket.send(bytes(str(file_size), "utf8"))
             # size_file = os.path.getsize(file_path)
             with open(file_path, "rb") as f:
                 # data = f.read(2048 * 5)
