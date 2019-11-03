@@ -29,6 +29,7 @@ class WindowChat(QMainWindow):
         # Setup event
         self.ui.txtUsername.setText(self.username)
         self.ui.btnSend.clicked.connect(self.sendMessage)
+        self.ui.btnOpenFile.clicked.connect(self.openFile)
         self.ui.etxtMessage.returnPressed.connect(self.sendMessage)
         self.ui.lvFriend.itemSelectionChanged.connect(self.setupChat)
 
@@ -72,9 +73,21 @@ class WindowChat(QMainWindow):
             self.ui.etxtMessage.clear()
             QMessageBox.about(self, "Warning", "You are talking to yourself. Choose someone to be less alone.")
 
+    def openFile(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        fileName, _ = QFileDialog.getOpenFileName(None, "Select File", "", "All Files (*)", options=options)
+        if fileName:
+            print(fileName)
+            self.sendFile(fileName)
+    
+    def sendFile(self, fileName):
+        pass
 
     def changeProfileImage(self):
-        fileName, _ = QFileDialog.getOpenFileName(None, "Select Image", "", "Image Files (*.png *.jpg *jpeg *.bmp)")  # Ask for file
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        fileName, _ = QFileDialog.getOpenFileName(None, "Select Image", "", "Image Files (*.png *.jpg *jpeg *.bmp)", options=options)  # Ask for file
         if fileName:  # If the user gives a file
             pixmap = QPixmap(fileName)  # Setup pixmap with the provided image
             pixmap = pixmap.scaled(self.ui.ivAvatar.width(), self.ui.ivAvatar.height(), Qt.KeepAspectRatio)  # Scale pixmap
