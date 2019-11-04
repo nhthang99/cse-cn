@@ -3,11 +3,8 @@
 import socket, sys, time
 from threading import Thread
 
-<<<<<<< HEAD
-# sys.path.append('./model')
-=======
 sys.path.append('.')
->>>>>>> daab078caa25139c10fac37e1984e5c2c7a5953b
+
 from model import Decode, Encode
 
 

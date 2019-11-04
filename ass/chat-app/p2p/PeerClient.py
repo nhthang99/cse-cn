@@ -26,10 +26,8 @@ class PeerClient(QObject):
                 self.message_received.emit(username + ': ' + content)
             file_name = Decode.decode_file_name(data)
             if file_name:
-<<<<<<< HEAD
                 file_size = self.socket_client.recv(32)
                 file_size = int.from_bytes(file_size, byteorder='big')
-=======
                 # with open(file_name, 'wb') as f:
                 #     while True:
                 #         data = self.socket_client.recv(self.BUFF_SIZE * 5)
@@ -37,9 +35,6 @@ class PeerClient(QObject):
                 #         if not data:
                 #             break
                 #         f.write(data)
-                file_size = self.socket_client.recv(32).decode("utf8")
-                file_size = int(file_size)
->>>>>>> daab078caa25139c10fac37e1984e5c2c7a5953b
                 file_to_write = open(file_name, 'wb')
                 chunksize = 10240
                 while file_size > 0:
