@@ -9,6 +9,10 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
+<<<<<<< HEAD
+=======
+# sys.path.append('./imgs')
+>>>>>>> daab078caa25139c10fac37e1984e5c2c7a5953b
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):

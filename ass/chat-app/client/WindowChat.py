@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 import os
 
+=======
+import os, time
+>>>>>>> daab078caa25139c10fac37e1984e5c2c7a5953b
 from gui.ClientGUI import Ui_MainWindow
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QStackedWidget, QListWidget, QMessageBox
 from PyQt5.QtGui import QPixmap
@@ -92,10 +96,12 @@ class WindowChat(QMainWindow):
             else:
                 socket_client = self.peer_chatting[self.curr_peer_chat]
                 self.socket_send_file(socket_client, my_name, self.curr_peer_chat, file_name, filePath)
+
         else:
             QMessageBox.about(self, "Warning", "Who do you want to send to?")
 
     def socket_send_file(self, sock, peer_src, peer_dest, file_name, file_path):
+<<<<<<< HEAD
         file_name_encode = Encode.encode_file_name(file_name)
         file_size = os.path.getsize(file_path)
         sock.send(bytes(file_name_encode, "utf8"))
@@ -103,10 +109,24 @@ class WindowChat(QMainWindow):
         sock.send(file_size)
         with open(file_path, "rb") as f:
             # data = f.read(2048 * 5)
+=======
+        file_name_encode = Encode.encode_file_name(file_name)        
+        file_size = os.path.getsize(file_path)
+        # file_size = bin(file_size)[2:].zfill(32)
+        sock.send(bytes(file_name_encode, "utf8"))
+        sock.send(bytes(str(file_size), "utf8"))
+        with open(file_path, "rb") as f:
+            # data = f.read(20480)
+>>>>>>> daab078caa25139c10fac37e1984e5c2c7a5953b
             # while data:
             #     sock.send(data)
-            #     data = f.read(2048 * 5)
+            #     data = f.read(20480)
             sock.sendfile(f)
+<<<<<<< HEAD
+=======
+
+        # sock.send(bytes(file_name_encode, "utf8"))
+>>>>>>> daab078caa25139c10fac37e1984e5c2c7a5953b
 
     def changeProfileImage(self):
         options = QFileDialog.Options()
