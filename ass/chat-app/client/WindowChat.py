@@ -90,29 +90,23 @@ class WindowChat(QMainWindow):
                 self.peer_server.send_file(my_name, self.curr_peer_chat, file_name, filePath)
             else:
                 socket_client = self.peer_chatting[self.curr_peer_chat]
-                self.socket_send_file(socket_client, my_name, self.curr_peer_chat, file_name, filePath)
+                self.socket_send_file(socket_client, file_name, filePath)
 
         else:
             QMessageBox.about(self, "Warning", "Who do you want to send to?")
 
-    def socket_send_file(self, sock, peer_src, peer_dest, file_name, file_path):
+    def socket_send_file(self, sock, file_name, file_path):
         file_name_encode = Encode.encode_file_name(file_name)
         file_size = os.path.getsize(file_path)
         sock.send(bytes(file_name_encode, "utf8"))
         file_size = file_size.to_bytes(32, byteorder='big')
         sock.send(file_size)
+
         with open(file_path, "rb") as f:
             # data = f.read(2048 * 5)
-            file_name_encode = Encode.encode_file_name(file_name)
-            file_size = os.path.getsize(file_path)
-            # file_size = bin(file_size)[2:].zfill(32)
-            sock.send(bytes(file_name_encode, "utf8"))
-            sock.send(bytes(str(file_size), "utf8"))
-        with open(file_path, "rb") as f:
-            # data = f.read(20480)
             # while data:
             #     sock.send(data)
-            #     data = f.read(20480)
+            #     data = f.read(2048 * 5)
             sock.sendfile(f)
 
     def changeProfileImage(self):
