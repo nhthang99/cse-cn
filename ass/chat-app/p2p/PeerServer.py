@@ -2,7 +2,7 @@ import socket, os
 from threading import Thread
 from PyQt5.QtCore import pyqtSignal, QObject
 
-import Decode, Encode
+from model import Decode, Encode
 
 
 class PeerServer(QObject):
@@ -46,7 +46,8 @@ class PeerServer(QObject):
 
     def receive_data(self, client_socket):
         while self.isRunning:
-            data = client_socket.recv(self.BUFF_SIZE).decode("utf8")
+            data = client_socket.recv(self.BUFF_SIZE).decode("utf8", "ignore")
+            print(data)
             msg_decode = Decode.decode_message(data)
             if msg_decode:
                 username = msg_decode[0]
@@ -54,13 +55,17 @@ class PeerServer(QObject):
                 self.message_received.emit(username + ': ' + content)
             file_name = Decode.decode_file_name(data)
             if file_name:
-                with open(file_name, 'wb') as f:
-                    while True:
-                        data = client_socket.recv(self.BUFF_SIZE * 5)
-                        # end_file = Decode.decode_file_name(data)
-                        if not data:
-                            break
-                        f.write(data)
+                file_size = client_socket.recv(32)
+                file_size = int.from_bytes(file_size, byteorder='big')
+                file_to_write = open(file_name, 'wb')
+                chunksize = 10240
+                while file_size > 0:
+                    if file_size < chunksize:
+                        chunksize = file_size
+                    data = client_socket.recv(chunksize)
+                    file_to_write.write(data)
+                    file_size -= len(data)
+                file_to_write.close()
 
     def send_message(self, peer_src, peer_dest, msg):
         if peer_dest in self.peer_connections.keys():
@@ -72,15 +77,15 @@ class PeerServer(QObject):
             file_name_encode = Encode.encode_file_name(file_name)
             peer_socket = self.peer_connections[peer_dest]
             peer_socket.send(bytes(file_name_encode, "utf8"))
-            # size_file = os.path.getsize(file_path)
+            file_size = os.path.getsize(file_path)
+            file_size = file_size.to_bytes(32, byteorder='big')
+            peer_socket.send(file_size)
             with open(file_path, "rb") as f:
                 # data = f.read(2048 * 5)
                 # while data:
                 #     peer_socket.send(data)
                 #     data = f.read(2048 * 5)
                 peer_socket.sendfile(f)
-
-            # peer_socket.send(bytes(file_name_encode))
 
     def close(self):
         self.isRunning = False

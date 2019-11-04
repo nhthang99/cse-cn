@@ -8,15 +8,13 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-import sys
-sys.path.append('./imgs')
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(310, 166)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("./imgs/logo.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("../imgs/logo.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
         MainWindow.setAutoFillBackground(True)
         self.centralwidget = QtWidgets.QWidget(MainWindow)

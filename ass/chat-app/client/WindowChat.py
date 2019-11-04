@@ -1,13 +1,13 @@
-import timeit, time
+import os
 
-from ClientGUI import Ui_MainWindow
+from gui.ClientGUI import Ui_MainWindow
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QStackedWidget, QListWidget, QMessageBox
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 
-from PeerServer import PeerServer
-from PeerClient import PeerClient
-import Emoji, Encode
+from p2p.PeerServer import PeerServer
+from p2p.PeerClient import PeerClient
+from model import Emoji, Encode
 
 class WindowChat(QMainWindow):
 
@@ -97,20 +97,16 @@ class WindowChat(QMainWindow):
 
     def socket_send_file(self, sock, peer_src, peer_dest, file_name, file_path):
         file_name_encode = Encode.encode_file_name(file_name)
-
+        file_size = os.path.getsize(file_path)
         sock.send(bytes(file_name_encode, "utf8"))
-        # size_file = os.path.getsize(file_path)
+        file_size = file_size.to_bytes(32, byteorder='big')
+        sock.send(file_size)
         with open(file_path, "rb") as f:
-            start = timeit.default_timer()
             # data = f.read(2048 * 5)
             # while data:
             #     sock.send(data)
             #     data = f.read(2048 * 5)
             sock.sendfile(f)
-            end = timeit.default_timer()
-            print("Time: ", end - start)
-
-        # sock.send(bytes(file_name_encode))
 
     def changeProfileImage(self):
         options = QFileDialog.Options()
