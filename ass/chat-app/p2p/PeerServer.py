@@ -47,7 +47,6 @@ class PeerServer(QObject):
     def receive_data(self, client_socket):
         while self.isRunning:
             data = client_socket.recv(self.BUFF_SIZE).decode("utf8")
-            print(data)
             msg_decode = Decode.decode_message(data)
             if msg_decode:
                 username = msg_decode[0]
